@@ -83,8 +83,8 @@ All binaries are pre-compiled, signed with an official RSA-4096 production keyst
 #### 🔐 SHA-256 Checksums (Release v1.6.6)
 | File | Architecture / Platform | SHA-256 Checksum |
 | :--- | :--- | :--- |
-| `mikes-grindhouse-light.apk` | Android TV / Fire TV | `F08F4A72BB66245EA173BD0A99B6B2D371CE47FF79349C7A16DA647A675B8AA4` |
-| `mikes-grindhouse-full.apk` | Android Phone / Tablet | `78C2BBACCAA84850FD860C9E34DAAC1CD81A00E03EAFDAFAF6F3E3413CB19FC2` |
+| `mikes-grindhouse-light.apk` | Android TV / Fire TV | `4B5A6D66EB90B035BFA8E15EFEEB6C6121C2155343E94FB14517DD9A5AE33FB8` |
+| `mikes-grindhouse-full.apk` | Android Phone / Tablet | `A49E2994C7D08787E469B6F3703FAC725F0B9ABE31D677ED90D614F3DD82026F` |
 | `mikes-grindhouse.ipa` | iOS (Unsigned Sideload) | `95027F5E6A97750F7AF93567E38D9DF3E83AFAC328913CD66D4C7E55DA36C84A` |
 
 *(Note on Sideloading: If Google Play Protect shows a notice on first install because it has not yet seen apps from this new developer certificate, simply click **"More details"** ➔ **"Install anyway"**).*
