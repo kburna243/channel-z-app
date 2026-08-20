@@ -67,7 +67,7 @@ private struct ConnectView: View {
     @State private var showBugReport = false
     @State private var showUpNext = false    // B.4: Queue-Overlay-Toggle
     @AppStorage("mca.server") private var savedServer = "https://cytu.be"
-    @AppStorage("mca.channel") private var savedChannel = "test"
+    @AppStorage("mca.channel") private var savedChannel = "420Grindhouse"
     @AppStorage("mca.nickname") private var savedNick = ""
 
     var body: some View {
