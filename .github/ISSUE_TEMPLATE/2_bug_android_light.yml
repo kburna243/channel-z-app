@@ -1,0 +1,69 @@
+name: "📺 Bug Report: Android Light (TV / Fire TV)"
+description: Report a bug or issue in the Android Light TV Edition (10-foot UI / D-Pad)
+title: "[Bug - Android TV Light]: "
+labels: ["bug", "android-light", "tv"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue with the **Android Light Edition** (`com.aistudio.grindhouse420.kxbz`) for Android TV / Fire TV.
+  - type: input
+    id: app_version
+    attributes:
+      label: App Version
+      description: What version is shown in Settings > Info (e.g. v1.6.4 / Build 32)?
+      placeholder: "v1.6.4"
+    validations:
+      required: true
+  - type: dropdown
+    id: device_model
+    attributes:
+      label: TV Device Model
+      options:
+        - "Amazon Fire TV Stick 4K Max"
+        - "Amazon Fire TV Stick 4K"
+        - "Amazon Fire TV Stick HD / Lite"
+        - "Amazon Fire TV Cube"
+        - "Nvidia Shield TV / Pro"
+        - "Chromecast with Google TV (4K / HD)"
+        - "Smart TV (Sony, Philips, TCL, Hisense Android TV)"
+        - "Other Android TV Box"
+    validations:
+      required: true
+  - type: dropdown
+    id: issue_category
+    attributes:
+      label: Issue Category
+      options:
+        - "Playback stuttering / freezing"
+        - "Audio out of sync / missing"
+        - "Remote D-Pad navigation not working"
+        - "Chat overlay display issue"
+        - "Metadata / Movie Poster / Trivia error"
+        - "Crash on startup or stream change"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Detailed explanation of the issue.
+      placeholder: "On Fire TV 4K Max, when switching to a YouTube stream, the player ..."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Start the app on TV
+        2. Wait for channel to connect
+        3. Press D-Pad Left for details
+        4. See problem
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Additional Info / Error message (Optional)

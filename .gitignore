@@ -1,0 +1,26 @@
+# Build outputs & Binaries
+*.apk
+*.aab
+*.ipa
+dist/
+dist.zip
+
+# Gradle & Build caches
+.gradle/
+build/
+**/build/
+.kotlin/
+**/.kotlin/
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.DS_Store
+Thumbs.db
+
+# Secrets & local config
+local.properties
+.env
+*.keystore.user

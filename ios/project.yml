@@ -1,0 +1,36 @@
+name: MikesCyTube
+options:
+  bundleIdPrefix: com.mikes.cytube
+  deploymentTarget:
+    iOS: "17.0"
+  developmentLanguage: de
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_IDENTITY: ""
+    CODE_SIGNING_REQUIRED: NO
+    CODE_SIGNING_ALLOWED: NO
+targets:
+  MikesCyTube:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Sources
+    resources:
+      - path: Resources
+        optional: true
+    # Kein info:-Block — XcodeGen wuerde App/Info.plist bei jedem generate ueberschreiben und
+    # dabei die gepflegten $(MARKETING_VERSION)/$(CURRENT_PROJECT_VERSION)-Platzhalter durch
+    # seine Standardwerte 1.0/1 ersetzen. Genau das ist passiert: die gebauten IPAs meldeten
+    # durchgaengig Version 1.0 (Build 1), unabhaengig davon, was hier stand.
+    settings:
+      base:
+        INFOPLIST_FILE: App/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.mikes.cytube
+        MARKETING_VERSION: "1.2.2"
+        CURRENT_PROJECT_VERSION: "13"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

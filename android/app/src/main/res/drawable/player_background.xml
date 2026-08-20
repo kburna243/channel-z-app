@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="1920dp"
+    android:height="1080dp"
+    android:viewportWidth="1920"
+    android:viewportHeight="1080">
+
+    <!-- Dark Burgundy / Midnight Background -->
+    <path
+        android:pathData="M0,0h1920v1080h-1920z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="960"
+                android:startY="0"
+                android:endX="960"
+                android:endY="1080"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#2B0A12" />
+                <item android:offset="0.4" android:color="#140508" />
+                <item android:offset="0.7" android:color="#360C16" />
+                <item android:offset="1.0" android:color="#0A0204" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Radial Vortex Rings -->
+    <path
+        android:pathData="M960,540m-520,0a520,520 0 1,0 1040,0a520,520 0 1,0 -1040,0"
+        android:strokeColor="#26FF3366"
+        android:strokeWidth="48"
+        android:fillColor="#00000000" />
+
+    <path
+        android:pathData="M960,540m-380,0a380,380 0 1,0 760,0a380,380 0 1,0 -760,0"
+        android:strokeColor="#33FF6321"
+        android:strokeWidth="32"
+        android:fillColor="#00000000" />
+
+    <path
+        android:pathData="M960,540m-240,0a240,240 0 1,0 480,0a240,240 0 1,0 -480,0"
+        android:strokeColor="#4D8A1224"
+        android:strokeWidth="40"
+        android:fillColor="#00000000" />
+
+    <!-- Center Vignette Glow -->
+    <path
+        android:pathData="M960,540m-140,0a140,140 0 1,0 280,0a140,140 0 1,0 -280,0"
+        android:fillColor="#33E50914" />
+</vector>

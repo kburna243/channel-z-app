@@ -1,0 +1,50 @@
+name: iOS Build (unsigned .ipa)
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: XcodeGen installieren
+        run: brew install xcodegen
+
+      - name: Projekt generieren
+        run: xcodegen generate
+
+      - name: Xcode-Version
+        run: xcodebuild -version
+
+      - name: Build App (unsigned)
+        run: |
+          xcodebuild \
+            -project MikesCyTube.xcodeproj \
+            -scheme MikesCyTube \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            -derivedDataPath build/DD \
+            build
+
+      - name: Unsigned .ipa erzeugen (Payload-zip)
+        run: |
+          APP_PATH=$(find build/DD/Build/Products/Release-iphoneos -maxdepth 1 -name "MikesCyTube.app" | head -1)
+          mkdir -p Payload
+          cp -R "$APP_PATH" Payload/
+          zip -r -q mikes-cytube-ios-unsigned.ipa Payload
+          ls -la mikes-cytube-ios-unsigned.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mikes-cytube-ios-unsigned
+          path: mikes-cytube-ios-unsigned.ipa
+          retention-days: 14

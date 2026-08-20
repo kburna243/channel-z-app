@@ -1,0 +1,32 @@
+name: "💡 Feature Request / Improvement"
+description: Suggest an idea or enhancement for Mikes 420 Grindhouse App
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to make the 420 Grindhouse experience even better? Let us know!
+  - type: dropdown
+    id: target_platform
+    attributes:
+      label: Target Platform / Edition
+      options:
+        - "Both Android Editions (Light & Full)"
+        - "Android Light (TV / Fire TV)"
+        - "Android Full (Mobile / Tablet)"
+        - "iOS App"
+        - "General / All"
+    validations:
+      required: true
+  - type: textarea
+    id: idea_description
+    attributes:
+      label: What feature would you like to see?
+      description: Describe your proposed idea or improvement.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: How would this improve the experience?

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ladebildschirm und Splash zeigen dasselbe Motiv. Ein Alias statt einer zweiten
+     Bilddatei: spart rund 1 MB im APK und laesst den sprechenden Namen stehen, falls
+     der Ladebildschirm spaeter ein eigenes Bild bekommen soll. Die Orientierung
+     loest Android beim Laden auf, drawable-land greift also auch hier. -->
+<bitmap xmlns:android="http://schemas.android.com/apk/res/android"
+    android:src="@drawable/splash_screen_image" />

@@ -1,0 +1,49 @@
+name: "🍏 Bug Report: iOS (IPA / iPhone / iPad)"
+description: Report a bug in the native iOS SwiftUI port
+title: "[Bug - iOS]: "
+labels: ["bug", "ios"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue with the **iOS native app**.
+  - type: input
+    id: app_version
+    attributes:
+      label: App Version
+      placeholder: "v1.2.2"
+    validations:
+      required: true
+  - type: input
+    id: device_ios
+    attributes:
+      label: Device & iOS Version
+      description: e.g. iPhone 15 Pro (iOS 17.5) / iPad Air 5 (iPadOS 17.4)
+      placeholder: "iPhone 15 Pro - iOS 17.5"
+    validations:
+      required: true
+  - type: dropdown
+    id: install_method
+    attributes:
+      label: Installation / Sideloading Tool
+      options:
+        - "AltStore"
+        - "Sideloadly"
+        - "TrollStore"
+        - "Scarlet / Enterprise Certificate"
+        - "Xcode Direct Install"
+        - "Other"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      validations:
+        required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+    validations:
+      required: true

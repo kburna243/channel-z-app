@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="1920dp"
+    android:height="1080dp"
+    android:viewportWidth="1920"
+    android:viewportHeight="1080">
+
+    <!-- Dark Night Sky -->
+    <path
+        android:pathData="M0,0h1920v1080h-1920z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="960"
+                android:startY="0"
+                android:endX="960"
+                android:endY="1080"
+                android:type="linear">
+                <item android:offset="0.0" android:color="#070A14" />
+                <item android:offset="0.6" android:color="#0C0D18" />
+                <item android:offset="1.0" android:color="#050508" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Glowing Moon -->
+    <path
+        android:pathData="M380,180m-50,0a50,50 0 1,0 100,0a50,50 0 1,0 -100,0"
+        android:fillColor="#E0EDFF" />
+    <path
+        android:pathData="M380,180m-60,0a60,60 0 1,0 120,0a60,60 0 1,0 -120,0"
+        android:strokeColor="#33A8C7FA"
+        android:strokeWidth="10"
+        android:fillColor="#00000000" />
+
+    <!-- Theater Building Silhouette -->
+    <path
+        android:pathData="M600,240 L1320,240 L1340,900 L580,900 Z"
+        android:fillColor="#1B0E1D" />
+
+    <!-- 42nd St Vertical Neon Blade -->
+    <path
+        android:pathData="M520,160 L600,160 L600,480 L520,480 Z"
+        android:fillColor="#8C1022" />
+    <path
+        android:pathData="M530,170 L590,170 L590,470 L530,470 Z"
+        android:strokeColor="#FFC107"
+        android:strokeWidth="4"
+        android:fillColor="#00000000" />
+
+    <!-- Main Central Arch & Neon Marquee -->
+    <path
+        android:pathData="M680,260 L1240,260 L1240,460 L680,460 Z"
+        android:fillColor="#14060C" />
+    <path
+        android:pathData="M680,260 L1240,260 L1240,460 L680,460 Z"
+        android:strokeColor="#FF3366"
+        android:strokeWidth="8"
+        android:fillColor="#00000000" />
+
+    <!-- Marquee Canopy -->
+    <path
+        android:pathData="M540,480 L1380,480 L1400,600 L520,600 Z"
+        android:fillColor="#22060C" />
+    <path
+        android:pathData="M560,500 L1360,500 L1360,580 L560,580 Z"
+        android:fillColor="#FFF6E0" />
+
+    <!-- Canopy Light Bulbs Strip -->
+    <path
+        android:pathData="M520,600 L1400,600 L1390,630 L530,630 Z"
+        android:fillColor="#FFD54F" />
+
+    <!-- Entrance Doors -->
+    <path
+        android:pathData="M800,640 L1120,640 L1120,900 L800,900 Z"
+        android:fillColor="#FF8A00" />
+</vector>
