@@ -2,7 +2,7 @@
 
 Hey everyone! 👋
 
-A good friend of mine (**Bernd**) and I (**Fried**) recently built an unofficial native app suite for **Android TV, Amazon Fire TV, Android smartphones, tablets, and iOS** to watch the [420 Grindhouse CyTube channel](https://cytu.be/r/420Grindhouse).
+A good friend of mine (**Mike**) and I (**Fried**) recently built an unofficial native app suite for **Android TV, Amazon Fire TV, Android smartphones, tablets, and iOS** to watch the [420 Grindhouse CyTube channel](https://cytu.be/r/420Grindhouse).
 
 Our goal was simple: **create an easy-to-use, native 10-foot UI that feels amazing on the big screen**, completely eliminating the need for a clunky web browser and mouse pointer on the TV. Originally, this was just a private project for our own living room. We never intended to release it publicly.
 

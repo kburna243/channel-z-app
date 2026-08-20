@@ -37,7 +37,7 @@ And since 420Grindhouse is all about cult cinema, B-movies, exploitation, horror
 
 ## 🍿 How it started
 
-A good friend of mine (**Bernd**) and I (**Fried**) originally built this native app for ourselves.
+A good friend of mine (**Mike**) and I (**Fried**) originally built this native app for ourselves.
 
 There was no commercial plan behind it. No startup pitch. No roadmap with 200 Jira tickets. We just wanted a clean, native way to watch the channel together in the living room without compromises.
 
