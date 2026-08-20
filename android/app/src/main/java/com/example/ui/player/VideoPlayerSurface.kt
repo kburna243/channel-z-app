@@ -373,7 +373,7 @@ private val YT_WATCHDOG_JS = """
           (function() {
             var iframe = document.getElementById('player_iframe');
             var lastTime = -1, lastMoveTs = Date.now(), state = -1, strikes = 0;
-            var lastSeekTs = 0;
+            var lastSeekTs = 0, pageLoadTs = Date.now();
 
             function send(func, args) {
               try {
@@ -415,21 +415,17 @@ private val YT_WATCHDOG_JS = """
                 if (isPaused && state === 1) {
                   send('pauseVideo');
                 } else if (!isPaused && state !== 1 && state !== 3 && state !== 0) {
-                  // Frueher stand hier state === 2, also nur "pausiert". Damit blieben die
-                  // beiden Zustaende aussen vor, in denen der Player nie angelaufen ist:
-                  // -1 (unstarted) und 5 (cued). Blieb Autoplay einmal aus, sah der Sync
-                  // weg, der Watchdog ebenfalls (der laeuft nur bei 1 und 3), und der
-                  // einmalige Play-Befehl beim Aufbau kann vor dem postMessage-Handshake
-                  // gekommen sein. Dann half nur noch ein Tastendruck. 0 (ended) bleibt
-                  // ausgenommen, sonst startet ein durchgelaufenes Video von vorn.
                   if (state !== 2) console.log('[sync] Player stand bei state=' + state + ', starte');
                   send('playVideo');
                 }
 
-                // 2. Time Drift Sync: Nur wenn lastTime bekannt, serverTime >= 0 und kein Seek in den letzten 2.5s
-                if (typeof serverTime === 'number' && serverTime >= 0 && lastTime >= 0 && (now - lastSeekTs > 2500)) {
+                // 2. Time Drift Sync: Keine Seeks während der ersten 12s und mind. 15s Abstand zwischen Seeks
+                if (now - pageLoadTs < 12000) return;
+                if (state === 3) return; // Buffering
+
+                if (typeof serverTime === 'number' && serverTime >= 0 && lastTime >= 0 && (now - lastSeekTs > 15000)) {
                   var diff = Math.abs(lastTime - serverTime);
-                  if (diff > (threshold || 3.0)) {
+                  if (diff > (threshold || 6.0)) {
                     console.log('[sync] Drift korrigiert: local=' + lastTime.toFixed(1) + 's, server=' + serverTime.toFixed(1) + 's (diff=' + diff.toFixed(1) + 's)');
                     lastSeekTs = now;
                     send('seekTo', [serverTime, true]);

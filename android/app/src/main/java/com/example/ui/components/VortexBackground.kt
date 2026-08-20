@@ -88,7 +88,7 @@ fun VortexBackground(
     ) {
         // 1. High-Resolution Player Background Artwork
         Image(
-            painter = painterResource(id = R.drawable.player_background_image),
+            painter = painterResource(id = R.drawable.splash_screen_image),
             contentDescription = "Player Background Artwork",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop

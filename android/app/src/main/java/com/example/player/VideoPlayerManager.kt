@@ -106,6 +106,7 @@ class VideoPlayerManager(
     private var shouldPlayWhenReady = true
     private var lastPlaybackPosition: Long = 0L
     private var lastSeekTimestampMs: Long = 0L
+    private var mediaLoadedTimestampMs: Long = 0L
 
     init {
         initializePlayer()
@@ -198,6 +199,9 @@ class VideoPlayerManager(
         _currentMedia.value = media
         reconnectAttempts = 0
         reconnectJob?.cancel()
+        val now = System.currentTimeMillis()
+        mediaLoadedTimestampMs = now
+        lastSeekTimestampMs = now
 
         if (media == null && customStreamUrl.isNullOrBlank()) {
             currentStreamUrl = null
@@ -315,13 +319,19 @@ class VideoPlayerManager(
         }
 
         // 2. Drift check
+        val now = System.currentTimeMillis()
+        // Grace period: Während des ersten Ladens (12s nach Videowechsel) oder beim Puffern KEINEN Suchlauf auslösen!
+        if (now - mediaLoadedTimestampMs < 12000L) return
+        if (player.playbackState == Player.STATE_BUFFERING || player.playbackState == Player.STATE_IDLE) return
+
         val targetMs = (targetSeconds * 1000).toLong()
         if (targetMs >= 0) {
             val currentMs = player.currentPosition
             val diff = Math.abs(currentMs - targetMs)
-            val now = System.currentTimeMillis()
-            // 3.0s threshold, with 2.0s grace period after seek to prevent stuttering
-            if (diff > 3000L && (now - lastSeekTimestampMs > 2000L)) {
+            // 7.0s Schwellenwert und mind. 15s Abstand zwischen Seeks.
+            // Ein 3-Sekunden-Schwellenwert flushte bei jedem 5s-mediaUpdate den Hardware-Decoder (MediaCodec),
+            // was zu Framedrops von 24fps auf 0.5fps und ewigem Stottern führte.
+            if (diff > 7000L && (now - lastSeekTimestampMs > 15000L)) {
                 lastSeekTimestampMs = now
                 Log.d(TAG, "Syncing ExoPlayer drift: local=${currentMs}ms, server=${targetMs}ms (diff=${diff}ms)")
                 player.seekTo(targetMs)
