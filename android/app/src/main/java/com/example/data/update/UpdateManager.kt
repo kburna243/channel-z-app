@@ -39,6 +39,7 @@ class UpdateManager(private val context: Context) {
      */
     private val versionEndpoints = listOf(
         "https://raw.githubusercontent.com/kburna243/mikes-420grindhouse-app/main/version.json",
+        "https://raw.githubusercontent.com/kburna243/mikes-cytube-dist/main/version.json",
         "https://servermitte.tailecbf0f.ts.net/mca/version.json"
     )
 

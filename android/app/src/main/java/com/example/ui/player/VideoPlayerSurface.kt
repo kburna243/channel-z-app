@@ -38,7 +38,7 @@ import androidx.media3.ui.PlayerView
 import com.example.data.model.MediaItem
 import com.example.data.model.MediaSyncUpdate
 import com.example.ui.theme.MidnightCanvas
-import com.example.player.PLAYBACK_LEAD_SECONDS
+import com.example.player.leadFor
 
 private const val TAG = "VideoPlayerSurface"
 
@@ -207,7 +207,7 @@ fun VideoPlayerSurface(
                                 userAgentString = "Mozilla/5.0 (Linux; Android 11; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
                             }
 
-                            val startSec = (mediaItem.currentTimeSeconds + PLAYBACK_LEAD_SECONDS).toInt()
+                            val startSec = (mediaItem.currentTimeSeconds + leadFor(mediaItem.currentTimeSeconds)).toInt()
                             val cleanYtId = extractYouTubeId(mediaItem.id)
                             val html = buildPlayerHtml(mediaItem, cleanYtId, startSec, isMuted, subtitlesEnabled)
                             loadDataWithBaseURL("https://cytu.be", html, "text/html", "UTF-8", null)

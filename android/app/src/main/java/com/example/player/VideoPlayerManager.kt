@@ -64,6 +64,17 @@ fun convertGoogleDriveUrl(url: String): String {
  */
 const val PLAYBACK_LEAD_SECONDS = 2.0
 
+/**
+ * Der Vorlauf gilt nur beim Einstieg mitten in ein laufendes Video.
+ *
+ * Faengt das Video gerade erst an — beim Videowechsel meldet CyTube eine Position nahe null —
+ * gibt es nichts aufzuholen: der Player startet ja gemeinsam mit dem Kanal. Der Vorlauf wuerde
+ * dann nur die ersten zwei Sekunden ueberspringen und bei ExoPlayer einen Suchlauf direkt nach
+ * dem Laden ausloesen, der den Decoder leert und als Aussetzer zu sehen ist.
+ */
+fun leadFor(currentTimeSeconds: Double): Double =
+    if (currentTimeSeconds > 5.0) PLAYBACK_LEAD_SECONDS else 0.0
+
 class VideoPlayerManager(
     private val context: Context,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -225,7 +236,8 @@ class VideoPlayerManager(
         if (rawUrl != null) {
             val streamUrl = convertGoogleDriveUrl(rawUrl)
             currentStreamUrl = streamUrl
-            val initialSeek = ((media?.currentTimeSeconds ?: 0.0) + PLAYBACK_LEAD_SECONDS) * 1000
+            val mediaPos = media?.currentTimeSeconds ?: 0.0
+            val initialSeek = (mediaPos + leadFor(mediaPos)) * 1000
             loadStreamInternal(streamUrl, resumePosition = initialSeek.toLong())
         } else {
             Log.d(TAG, "No direct streamable URL for media: ${media?.title} (type: ${media?.type})")
