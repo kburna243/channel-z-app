@@ -58,22 +58,36 @@ Watching on a big screen with a TV remote and chatting on a phone keyboard are t
 
 ### 📥 Download & Installation
 
-#### 1. For Amazon Fire TV / Android TV (via Downloader App):
+All binaries are pre-compiled, signed with an official RSA-4096 production keystore, and available directly from the [GitHub Releases Page](https://github.com/kburna243/mikes-420grindhouse-app/releases/latest).
+
+#### 📺 Option 1: Amazon Fire TV & Android TV (via Downloader App)
 1. Install the **Downloader** app from the Amazon Appstore or Google Play Store.
-2. In Fire TV Settings: Go to `My Fire TV` > `Developer Options` > `Install Unknown Apps` > Enable **Downloader**.
-3. Open Downloader and enter the direct APK link:  
-   👉 **`https://github.com/kburna243/mikes-420grindhouse-app/releases/download/v1.6.6/mikes-grindhouse-light.apk`**
-4. Hit **Install**. *(No logins or manual server setups required – it connects to 420Grindhouse instantly on first launch!)*
+2. In Fire TV Settings: Go to `My Fire TV` ➔ `Developer Options` ➔ `Install Unknown Apps` ➔ Set **Downloader** to **ON**.
+3. Open **Downloader** and enter the direct download link into the URL field:  
+   👉 **`https://github.com/kburna243/mikes-420grindhouse-app/releases/latest/download/mikes-grindhouse-light.apk`**
+4. Click **Download** and then **Install**.  
+   *(No server configuration needed – it connects to 420Grindhouse automatically on startup!)*
 
-#### 2. For Android Smartphones / Tablets:
-* Download and install the Full Edition APK:  
-  👉 **`https://github.com/kburna243/mikes-420grindhouse-app/releases/download/v1.6.6/mikes-grindhouse-full.apk`**
+#### 📱 Option 2: Android Smartphones & Tablets
+* Download the Full Edition APK:  
+  👉 **`https://github.com/kburna243/mikes-420grindhouse-app/releases/latest/download/mikes-grindhouse-full.apk`**
+* Tap the downloaded `.apk` file to install.
 
-#### 3. For iOS (iPhone / iPad):
-* Download the IPA file and sideload via AltStore, Sideloadly, or TrollStore:  
-  👉 **`https://github.com/kburna243/mikes-420grindhouse-app/releases/download/v1.6.6/mikes-grindhouse.ipa`**
+#### 🍏 Option 3: iOS (iPhone / iPad)
+* Download the native IPA:  
+  👉 **`https://github.com/kburna243/mikes-420grindhouse-app/releases/latest/download/mikes-grindhouse.ipa`**
+* Sideload using **AltStore**, **Sideloadly**, or **TrollStore**.
 
-*(Note on Sideloading: If Google Play Protect shows a prompt on first install saying it hasn't seen apps from this new developer certificate yet, simply click **"More details"** ➔ **"Install anyway"**).*
+---
+
+#### 🔐 SHA-256 Checksums (Release v1.6.6)
+| File | Architecture / Platform | SHA-256 Checksum |
+| :--- | :--- | :--- |
+| `mikes-grindhouse-light.apk` | Android TV / Fire TV | `F08F4A72BB66245EA173BD0A99B6B2D371CE47FF79349C7A16DA647A675B8AA4` |
+| `mikes-grindhouse-full.apk` | Android Phone / Tablet | `78C2BBACCAA84850FD860C9E34DAAC1CD81A00E03EAFDAFAF6F3E3413CB19FC2` |
+| `mikes-grindhouse.ipa` | iOS (Unsigned Sideload) | `95027F5E6A97750F7AF93567E38D9DF3E83AFAC328913CD66D4C7E55DA36C84A` |
+
+*(Note on Sideloading: If Google Play Protect shows a notice on first install because it has not yet seen apps from this new developer certificate, simply click **"More details"** ➔ **"Install anyway"**).*
 
 ---
 
