@@ -318,23 +318,40 @@ class VideoPlayerManager(
             }
         }
 
-        // 2. Drift check
+        // 2. Continuous Sync & Adaptive Drift Reconciliation
         val now = System.currentTimeMillis()
-        // Grace period: Während des ersten Ladens (12s nach Videowechsel) oder beim Puffern KEINEN Suchlauf auslösen!
-        if (now - mediaLoadedTimestampMs < 12000L) return
+        // Grace period: Während des ersten Ladens (10s nach Videowechsel) oder beim Puffern KEINE Korrekturen
+        if (now - mediaLoadedTimestampMs < 10000L) return
         if (player.playbackState == Player.STATE_BUFFERING || player.playbackState == Player.STATE_IDLE) return
 
-        val targetMs = (targetSeconds * 1000).toLong()
+        // Lead-Time Kompensation (analog spudzareneat/grindhouse-tv leadtime.js):
+        // +2s Vorlauf kompensiert Netzwerk- und Decoderlatenz gegenüber dem CyTube-Server.
+        val effectiveTargetSeconds = targetSeconds + PLAYBACK_LEAD_SECONDS
+        val targetMs = (effectiveTargetSeconds * 1000).toLong()
         if (targetMs >= 0) {
             val currentMs = player.currentPosition
-            val diff = Math.abs(currentMs - targetMs)
-            // 7.0s Schwellenwert und mind. 15s Abstand zwischen Seeks.
-            // Ein 3-Sekunden-Schwellenwert flushte bei jedem 5s-mediaUpdate den Hardware-Decoder (MediaCodec),
-            // was zu Framedrops von 24fps auf 0.5fps und ewigem Stottern führte.
-            if (diff > 7000L && (now - lastSeekTimestampMs > 15000L)) {
+            val diffMs = targetMs - currentMs // positiv = wir hängen hinterher, negativ = wir sind voraus
+            val absDiffMs = Math.abs(diffMs)
+
+            if (absDiffMs > 7000L && (now - lastSeekTimestampMs > 15000L)) {
+                // Große Abweichung (> 7s, z.B. nach langem Pausieren): Harter Seek
                 lastSeekTimestampMs = now
-                Log.d(TAG, "Syncing ExoPlayer drift: local=${currentMs}ms, server=${targetMs}ms (diff=${diff}ms)")
+                Log.d(TAG, "Syncing large drift via seekTo: local=${currentMs}ms, target=${targetMs}ms (diff=${diffMs}ms)")
+                player.setPlaybackSpeed(1.0f)
                 player.seekTo(targetMs)
+            } else if (absDiffMs > 1500L && absDiffMs <= 7000L) {
+                // Moderate Abweichung (1.5s bis 7s): Sanftes Beschleunigen (1.04x) oder Verlangsamen (0.96x).
+                // Pitch bleibt dank ExoPlayer Sonic-Audio-Engine unverändert; kein Decoder-Flush, kein Stottern!
+                val speed = if (diffMs > 0) 1.04f else 0.96f
+                if (Math.abs(player.playbackParameters.speed - speed) > 0.01f) {
+                    Log.d(TAG, "Nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
+                    player.setPlaybackSpeed(speed)
+                }
+            } else if (absDiffMs <= 1000L) {
+                // Perfekt im Sync (< 1.0s): Normalgeschwindigkeit 1.0x
+                if (player.playbackParameters.speed != 1.0f) {
+                    player.setPlaybackSpeed(1.0f)
+                }
             }
         }
     }
