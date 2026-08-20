@@ -320,8 +320,8 @@ class VideoPlayerManager(
 
         // 2. Continuous Sync & Adaptive Drift Reconciliation
         val now = System.currentTimeMillis()
-        // Grace period: Während des ersten Ladens (10s nach Videowechsel) oder beim Puffern KEINE Korrekturen
-        if (now - mediaLoadedTimestampMs < 10000L) return
+        // Grace period: Während des ersten Ladens (20s nach Videowechsel) oder beim Puffern KEINE Korrekturen
+        if (now - mediaLoadedTimestampMs < 20000L) return
         if (player.playbackState == Player.STATE_BUFFERING || player.playbackState == Player.STATE_IDLE) return
 
         // Lead-Time Kompensation (analog spudzareneat/grindhouse-tv leadtime.js):
@@ -333,22 +333,29 @@ class VideoPlayerManager(
             val diffMs = targetMs - currentMs // positiv = wir hängen hinterher, negativ = wir sind voraus
             val absDiffMs = Math.abs(diffMs)
 
-            if (absDiffMs > 7000L && (now - lastSeekTimestampMs > 15000L)) {
-                // Große Abweichung (> 7s, z.B. nach langem Pausieren): Harter Seek
+            if (absDiffMs > 35000L && (now - lastSeekTimestampMs > 30000L)) {
+                // Extrem große Abweichung (> 35s, z.B. manueller Sprung oder langes Pausieren): Harter Seek
                 lastSeekTimestampMs = now
-                Log.d(TAG, "Syncing large drift via seekTo: local=${currentMs}ms, target=${targetMs}ms (diff=${diffMs}ms)")
+                Log.d(TAG, "Syncing major desync (>35s) via seekTo: local=${currentMs}ms, target=${targetMs}ms (diff=${diffMs}ms)")
                 player.setPlaybackSpeed(1.0f)
                 player.seekTo(targetMs)
-            } else if (absDiffMs > 1500L && absDiffMs <= 7000L) {
-                // Moderate Abweichung (1.5s bis 7s): Sanftes Beschleunigen (1.04x) oder Verlangsamen (0.96x).
-                // Pitch bleibt dank ExoPlayer Sonic-Audio-Engine unverändert; kein Decoder-Flush, kein Stottern!
-                val speed = if (diffMs > 0) 1.04f else 0.96f
+            } else if (absDiffMs >= 8000L && absDiffMs <= 35000L) {
+                // Größere Abweichung (8s bis 35s): Zügige Geschwindigkeitsanpassung (1.08x / 0.92x)
+                // Holt 1s Drift alle 12s auf — komplett ohne Decoder-Flush oder Frame-Drops!
+                val speed = if (diffMs > 0) 1.08f else 0.92f
                 if (Math.abs(player.playbackParameters.speed - speed) > 0.01f) {
-                    Log.d(TAG, "Nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
+                    Log.d(TAG, "Fast-nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
                     player.setPlaybackSpeed(speed)
                 }
-            } else if (absDiffMs <= 1000L) {
-                // Perfekt im Sync (< 1.0s): Normalgeschwindigkeit 1.0x
+            } else if (absDiffMs >= 2000L && absDiffMs < 8000L) {
+                // Moderate Abweichung (2s bis 8s): Sanfte Geschwindigkeitsanpassung (1.04x / 0.96x)
+                val speed = if (diffMs > 0) 1.04f else 0.96f
+                if (Math.abs(player.playbackParameters.speed - speed) > 0.01f) {
+                    Log.d(TAG, "Soft-nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
+                    player.setPlaybackSpeed(speed)
+                }
+            } else if (absDiffMs < 1500L) {
+                // Perfekt im Sync (< 1.5s): Normalgeschwindigkeit 1.0x
                 if (player.playbackParameters.speed != 1.0f) {
                     player.setPlaybackSpeed(1.0f)
                 }

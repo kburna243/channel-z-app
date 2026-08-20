@@ -419,13 +419,13 @@ private val YT_WATCHDOG_JS = """
                   send('playVideo');
                 }
 
-                // 2. Time Drift Sync: Keine Seeks während der ersten 12s und mind. 15s Abstand zwischen Seeks
-                if (now - pageLoadTs < 12000) return;
+                // 2. Time Drift Sync: Keine Seeks während der ersten 20s und mind. 30s Abstand zwischen Seeks
+                if (now - pageLoadTs < 20000) return;
                 if (state === 3) return; // Buffering
 
-                if (typeof serverTime === 'number' && serverTime >= 0 && lastTime >= 0 && (now - lastSeekTs > 15000)) {
+                if (typeof serverTime === 'number' && serverTime >= 0 && lastTime >= 0 && (now - lastSeekTs > 30000)) {
                   var diff = Math.abs(lastTime - serverTime);
-                  if (diff > (threshold || 6.0)) {
+                  if (diff > (threshold || 35.0)) {
                     console.log('[sync] Drift korrigiert: local=' + lastTime.toFixed(1) + 's, server=' + serverTime.toFixed(1) + 's (diff=' + diff.toFixed(1) + 's)');
                     lastSeekTs = now;
                     send('seekTo', [serverTime, true]);
