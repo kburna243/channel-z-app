@@ -48,12 +48,18 @@ android {
   // JIT-Optimierung und tragen android:debuggable, was den App-Speicher auf jedem Geraet mit
   // adb auslesbar macht. Ein Release-Build behebt beides. Die Signatur bleibt dabei dieselbe,
   // sonst muesste jeder Tester die App vorher deinstallieren.
+  val releaseKeystore = file("${rootDir}/grindhouse-release.jks")
   val uploadKeystore = file(System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks")
   val hasUploadKeystore = uploadKeystore.exists()
 
   signingConfigs {
     create("release") {
-      if (hasUploadKeystore) {
+      if (releaseKeystore.exists()) {
+        storeFile = releaseKeystore
+        storePassword = System.getenv("STORE_PASSWORD") ?: "grindhouse420"
+        keyAlias = "grindhouse"
+        keyPassword = System.getenv("KEY_PASSWORD") ?: "grindhouse420"
+      } else if (hasUploadKeystore) {
         storeFile = uploadKeystore
         storePassword = System.getenv("STORE_PASSWORD")
         keyAlias = "upload"
