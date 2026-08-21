@@ -320,8 +320,8 @@ class VideoPlayerManager(
 
         // 2. Continuous Sync & Adaptive Drift Reconciliation
         val now = System.currentTimeMillis()
-        // Grace period: Während des ersten Ladens (20s nach Videowechsel) oder beim Puffern KEINE Korrekturen
-        if (now - mediaLoadedTimestampMs < 20000L) return
+        // Grace period: Während des ersten Ladens (25s nach Videowechsel) oder beim Puffern KEINE Korrekturen
+        if (now - mediaLoadedTimestampMs < 25000L) return
         if (player.playbackState == Player.STATE_BUFFERING || player.playbackState == Player.STATE_IDLE) return
 
         // Lead-Time Kompensation (analog spudzareneat/grindhouse-tv leadtime.js):
@@ -333,29 +333,36 @@ class VideoPlayerManager(
             val diffMs = targetMs - currentMs // positiv = wir hängen hinterher, negativ = wir sind voraus
             val absDiffMs = Math.abs(diffMs)
 
-            if (absDiffMs > 35000L && (now - lastSeekTimestampMs > 30000L)) {
-                // Extrem große Abweichung (> 35s, z.B. manueller Sprung oder langes Pausieren): Harter Seek
+            if (absDiffMs > 120000L && (now - lastSeekTimestampMs > 45000L)) {
+                // Nur bei extremen Desyncs (> 2 Minuten, z.B. manueller Playlist-Sprung): Harter Seek
                 lastSeekTimestampMs = now
-                Log.d(TAG, "Syncing major desync (>35s) via seekTo: local=${currentMs}ms, target=${targetMs}ms (diff=${diffMs}ms)")
+                Log.d(TAG, "Syncing major desync (>120s) via seekTo: local=${currentMs}ms, target=${targetMs}ms (diff=${diffMs}ms)")
                 player.setPlaybackSpeed(1.0f)
                 player.seekTo(targetMs)
-            } else if (absDiffMs >= 8000L && absDiffMs <= 35000L) {
-                // Größere Abweichung (8s bis 35s): Zügige Geschwindigkeitsanpassung (1.08x / 0.92x)
-                // Holt 1s Drift alle 12s auf — komplett ohne Decoder-Flush oder Frame-Drops!
-                val speed = if (diffMs > 0) 1.08f else 0.92f
+            } else if (absDiffMs >= 15000L && absDiffMs <= 120000L) {
+                // Große Abweichung (15s bis 120s): Stärkere Geschwindigkeitsanpassung (1.12x / 0.88x)
+                // Holt 1.2s Drift alle 10s auf — komplett ohne Decoder-Flush oder Bild-Einfrieren!
+                val speed = if (diffMs > 0) 1.12f else 0.88f
                 if (Math.abs(player.playbackParameters.speed - speed) > 0.01f) {
                     Log.d(TAG, "Fast-nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
                     player.setPlaybackSpeed(speed)
                 }
-            } else if (absDiffMs >= 2000L && absDiffMs < 8000L) {
-                // Moderate Abweichung (2s bis 8s): Sanfte Geschwindigkeitsanpassung (1.04x / 0.96x)
-                val speed = if (diffMs > 0) 1.04f else 0.96f
+            } else if (absDiffMs >= 4000L && absDiffMs < 15000L) {
+                // Mittlere Abweichung (4s bis 15s): Zügige Geschwindigkeitsanpassung (1.06x / 0.94x)
+                val speed = if (diffMs > 0) 1.06f else 0.94f
+                if (Math.abs(player.playbackParameters.speed - speed) > 0.01f) {
+                    Log.d(TAG, "Medium-nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
+                    player.setPlaybackSpeed(speed)
+                }
+            } else if (absDiffMs >= 1200L && absDiffMs < 4000L) {
+                // Sanfte Abweichung (1.2s bis 4s): Sanfte Geschwindigkeitsanpassung (1.02x / 0.98x)
+                val speed = if (diffMs > 0) 1.02f else 0.98f
                 if (Math.abs(player.playbackParameters.speed - speed) > 0.01f) {
                     Log.d(TAG, "Soft-nudging playback speed to ${speed}x (drift: ${diffMs}ms)")
                     player.setPlaybackSpeed(speed)
                 }
-            } else if (absDiffMs < 1500L) {
-                // Perfekt im Sync (< 1.5s): Normalgeschwindigkeit 1.0x
+            } else if (absDiffMs < 1200L) {
+                // Perfekt im Sync (< 1.2s): Normalgeschwindigkeit 1.0x
                 if (player.playbackParameters.speed != 1.0f) {
                     player.setPlaybackSpeed(1.0f)
                 }
