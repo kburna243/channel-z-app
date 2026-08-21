@@ -17,8 +17,8 @@ android {
     applicationId = "com.aistudio.grindhouse420.kxbz"
     minSdk = 24
     targetSdk = 36
-    versionCode = 35
-    versionName = "1.6.7"
+    versionCode = 36
+    versionName = "1.6.8"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }

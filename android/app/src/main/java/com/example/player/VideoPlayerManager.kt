@@ -202,6 +202,7 @@ class VideoPlayerManager(
         val now = System.currentTimeMillis()
         mediaLoadedTimestampMs = now
         lastSeekTimestampMs = now
+        shouldPlayWhenReady = media?.paused != true
 
         if (media == null && customStreamUrl.isNullOrBlank()) {
             currentStreamUrl = null
@@ -290,6 +291,7 @@ class VideoPlayerManager(
                 player.seekTo(resumePosition)
             }
             player.prepare()
+            shouldPlayWhenReady = true
             player.playWhenReady = true
             player.play()
             _isPlaying.value = true
@@ -311,10 +313,17 @@ class VideoPlayerManager(
 
         // 1. Play / Pause state sync
         if (paused != null) {
-            if (paused && player.playWhenReady) {
-                pause()
-            } else if (!paused && !player.playWhenReady && shouldPlayWhenReady) {
-                play()
+            if (paused) {
+                if (player.playWhenReady) {
+                    player.pause()
+                    _isPlaying.value = false
+                }
+            } else {
+                if (!player.playWhenReady) {
+                    shouldPlayWhenReady = true
+                    player.play()
+                    _isPlaying.value = true
+                }
             }
         }
 
