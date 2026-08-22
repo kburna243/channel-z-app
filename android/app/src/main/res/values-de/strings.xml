@@ -88,9 +88,9 @@
         <item quantity="one">%1$d Zeile gleichzeitig sichtbar</item>
         <item quantity="other">%1$d Zeilen gleichzeitig sichtbar</item>
     </plurals>
-    <string name="epg_up_next_reddit">ALS NÄCHSTES (REDDIT-EPG)</string>
-    <string name="epg_reddit_title_default">420Grindhouse Reddit-Sendeplan</string>
-    <string name="epg_queue_title_reddit">420GRINDHOUSE SENDEPLAN</string>
+    <string name="epg_up_next_reddit">ALS NÄCHSTES (SENDEPLAN)</string>
+    <string name="epg_reddit_title_default">Channel-Z Raum-Sendeplan</string>
+    <string name="epg_queue_title_reddit">CHANNEL-Z SENDEPLAN</string>
     <string name="settings_chat_appearance">Chat-Darstellung</string>
     <string name="settings_chat_appearance_sub">Zeilen, Einblenddauer, Farben, Deckkraft, Schriftgröße</string>
     <string name="action_back">Zurück</string>

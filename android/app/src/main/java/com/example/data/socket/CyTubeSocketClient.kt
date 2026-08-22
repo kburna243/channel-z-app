@@ -83,6 +83,9 @@ class CyTubeSocketClient(
     private val _emotes = MutableStateFlow<List<ChannelEmote>>(emptyList())
     val emotes: StateFlow<List<ChannelEmote>> = _emotes.asStateFlow()
 
+    private val _motd = MutableStateFlow<String?>(null)
+    val motd: StateFlow<String?> = _motd.asStateFlow()
+
     private val _loginState = MutableStateFlow<LoginState>(LoginState.LoggedOut)
     val loginState: StateFlow<LoginState> = _loginState.asStateFlow()
 
@@ -282,6 +285,18 @@ class CyTubeSocketClient(
                         "emoteList" -> {
                             val list = eventArray.optJSONArray(1)
                             if (list != null) handleEmoteList(list)
+                        }
+                        "setMotd" -> {
+                            val motdHtml = eventArray.optString(1, "")
+                            if (motdHtml.isNotBlank()) {
+                                val cleanText = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                                    android.text.Html.fromHtml(motdHtml, android.text.Html.FROM_HTML_MODE_LEGACY).toString().trim()
+                                } else {
+                                    @Suppress("DEPRECATION")
+                                    android.text.Html.fromHtml(motdHtml).toString().trim()
+                                }
+                                _motd.value = cleanText.ifBlank { null }
+                            }
                         }
                         "login" -> {
                             val data = eventArray.optJSONObject(1)

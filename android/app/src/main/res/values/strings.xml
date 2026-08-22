@@ -87,9 +87,9 @@
         <item quantity="one">%1$d line visible at a time</item>
         <item quantity="other">%1$d lines visible at a time</item>
     </plurals>
-    <string name="epg_up_next_reddit">UP NEXT (REDDIT EPG)</string>
-    <string name="epg_reddit_title_default">420Grindhouse Reddit schedule</string>
-    <string name="epg_queue_title_reddit">420GRINDHOUSE SCHEDULE</string>
+    <string name="epg_up_next_reddit">UP NEXT (SCHEDULE)</string>
+    <string name="epg_reddit_title_default">Channel-Z Room Schedule</string>
+    <string name="epg_queue_title_reddit">CHANNEL-Z SCHEDULE</string>
     <string name="settings_chat_appearance">Chat Appearance</string>
     <string name="settings_chat_appearance_sub">Lines, duration, colours, opacity, font size</string>
     <string name="action_back">Back</string>

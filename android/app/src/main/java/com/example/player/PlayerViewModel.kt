@@ -86,6 +86,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         dataScraper.redditScheduleText,
         dataScraper.isRedditFallback,
         socketClient.userCount,
+        socketClient.motd,
         settings
     ) { args: Array<Any?> ->
         val now = args[0] as? MediaItem
@@ -101,12 +102,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         val redditText = args[6] as? String
         val isReddit = args[7] as? Boolean ?: false
         val users = args[8] as? Int ?: 0
-        val cfg = args[9] as? AppSettings ?: AppSettings()
+        val motdText = args[9] as? String
+        val cfg = args[10] as? AppSettings ?: AppSettings()
 
-        // Rangfolge: die per Socket gelieferte Raum-Playlist ist die tatsaechliche Warteschlange
-        // und hat Vorrang. Der Reddit-EPG ist nur ein Notbehelf mit geschaetzten Laufzeiten
-        // (pauschal 90 Minuten) und ab "jetzt" hochgerechneten Startzeiten — vorher hat er die
-        // echten Daten 15 Sekunden nach dem Start ueberschrieben.
         val socketCandidates = if (socketNext.isNotEmpty()) socketNext else socketPlaylist
         val socketQueue = buildQueueScheduleFromSocket(now, socketCandidates)
 
@@ -123,6 +121,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         val finalQueueItems = if (socketQueue.isNotEmpty()) socketQueue else scrapedQueueItems
+        val effectiveAnnouncementText = motdText ?: redditText
+        val effectiveAnnouncementTitle = if (motdText != null) "Channel-Z Room MOTD" else redditTitle
 
         MetadataOverlayState(
             nowPlaying = now,
@@ -131,9 +131,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             channelName = cfg.roomName,
             userCount = users,
             isLoading = now == null,
-            redditScheduleTitle = redditTitle,
-            redditScheduleText = redditText,
-            isRedditFallback = isReddit && socketQueue.isEmpty()
+            redditScheduleTitle = effectiveAnnouncementTitle,
+            redditScheduleText = effectiveAnnouncementText,
+            isRedditFallback = (isReddit && socketQueue.isEmpty()) || !motdText.isNullOrBlank()
         )
     }.stateIn(
         scope = viewModelScope,

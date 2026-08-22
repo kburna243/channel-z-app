@@ -127,7 +127,7 @@ fun UpNextOverlay(
                                 )
                             )
                             Text(
-                                text = if (isRedditFallback) "Reddit EPG Broadcast (r/420grindhouse)" else "https://cytubot.onrender.com/",
+                                text = if (isRedditFallback) "Channel-Z Announcement" else "Channel-Z Live Playlist (cytu.be/r/Channel-Z)",
                                 style = TextStyle(
                                     color = if (isRedditFallback) AccentVibrantOrange else TextMuted,
                                     fontSize = 11.sp,
