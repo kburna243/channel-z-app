@@ -108,21 +108,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         val socketCandidates = if (socketNext.isNotEmpty()) socketNext else socketPlaylist
         val socketQueue = buildQueueScheduleFromSocket(now, socketCandidates)
 
-        val finalNext = when {
-            socketNext.isNotEmpty() -> socketNext
-            scheduleNext.isNotEmpty() -> scheduleNext
-            else -> scrapedQueueItems.map { q ->
-                MediaItem(
-                    id = q.mediaId,
-                    title = q.title,
-                    durationSeconds = q.durationSeconds.toDouble()
-                )
-            }
-        }
-
-        val finalQueueItems = if (socketQueue.isNotEmpty()) socketQueue else scrapedQueueItems
-        val effectiveAnnouncementText = motdText ?: redditText
-        val effectiveAnnouncementTitle = if (motdText != null) "Channel-Z Room MOTD" else redditTitle
+        val finalNext = socketNext
+        val finalQueueItems = socketQueue
 
         MetadataOverlayState(
             nowPlaying = now,
@@ -131,9 +118,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             channelName = cfg.roomName,
             userCount = users,
             isLoading = now == null,
-            redditScheduleTitle = effectiveAnnouncementTitle,
-            redditScheduleText = effectiveAnnouncementText,
-            isRedditFallback = (isReddit && socketQueue.isEmpty()) || !motdText.isNullOrBlank()
+            redditScheduleTitle = if (!motdText.isNullOrBlank()) "Channel-Z Room MOTD" else null,
+            redditScheduleText = motdText,
+            isRedditFallback = !motdText.isNullOrBlank()
         )
     }.stateIn(
         scope = viewModelScope,

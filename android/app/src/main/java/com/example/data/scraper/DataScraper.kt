@@ -77,28 +77,19 @@ class DataScraper(
      * identischem JSON-Format. Die frueher fest verdrahtete Render-Instanz bleibt als Zweitquelle
      * stehen, sie war zeitweise vom Anbieter abgeschaltet.
      */
-    private val scheduleEndpoints = listOf(
-        "https://bot.420grindhouseserver.com/schedule",
-        "https://cytubot.onrender.com/schedule"
-    )
+    private val scheduleEndpoints = emptyList<String>()
 
     private var pollingJob: Job? = null
 
     init {
-        startScraping()
+        // Channel-Z uses native CyTube WebSocket playlist events instead of external scrapers
     }
 
     /**
-     * Starts periodic schedule fetching (polls cytubot / reddit every 15 seconds).
+     * Starts periodic schedule fetching (no-op for Channel-Z).
      */
     fun startScraping(pollIntervalMillis: Long = 15000L) {
-        pollingJob?.cancel()
-        pollingJob = scope.launch(ioDispatcher) {
-            while (isActive) {
-                fetchSchedule()
-                delay(pollIntervalMillis)
-            }
-        }
+        // No-op
     }
 
     fun stopScraping() {
@@ -106,14 +97,8 @@ class DataScraper(
         pollingJob = null
     }
 
-    /**
-     * Main fetch method: First attempts cytubot.onrender.com; falls back to Reddit EPG if unavailable.
-     */
     suspend fun fetchSchedule() = withContext(ioDispatcher) {
-        val success = fetchScheduleFromCytubot()
-        if (!success || _queueScheduleItems.value.isEmpty()) {
-            fetchScheduleFromReddit()
-        }
+        // No-op
     }
 
     /**
