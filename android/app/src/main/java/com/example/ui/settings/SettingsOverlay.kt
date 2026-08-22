@@ -1028,7 +1028,7 @@ fun SettingsOverlay(
                                 }
                             }
 
-                            // 5. Chat Farbtheme (Feature #4: Grindhouse / Classic-CyTube)
+                            // 5. Chat Farbtheme (Feature #4: Channel-Z / Classic-CyTube)
                             item {
                                 FocusableSettingsItem(
                                     title = stringResource(R.string.settings_chat_theme),
@@ -1036,10 +1036,10 @@ fun SettingsOverlay(
                                         stringResource(R.string.settings_chat_theme_classic)
                                     else stringResource(R.string.settings_chat_theme_grindhouse),
                                     icon = Icons.Default.Palette,
-                                    onClick = { onUpdateChatTheme(if (settings.chatTheme == "classic") "grindhouse" else "classic") }
+                                    onClick = { onUpdateChatTheme(if (settings.chatTheme == "classic") "channelz" else "classic") }
                                 ) {
                                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                        listOf("grindhouse" to "Grindhouse", "classic" to "Classic").forEach { (code, label) ->
+                                        listOf("channelz" to "Channel-Z", "classic" to "Classic").forEach { (code, label) ->
                                             val isSelected = settings.chatTheme == code
                                             Surface(
                                                 color = if (isSelected) AccentIceBlue else SurfaceDark,
@@ -1188,14 +1188,14 @@ private fun PalettePreview(palette: ThemePalette) {
 private fun themeNameRes(id: String): Int = when (id) {
     "cyberpunk" -> R.string.theme_cyberpunk
     "editorial" -> R.string.theme_editorial
-    "grindhouse" -> R.string.theme_grindhouse
+    "channelz", "grindhouse" -> R.string.theme_grindhouse
     else -> R.string.theme_cinematic
 }
 
 private fun themeDescriptionRes(id: String): Int = when (id) {
     "cyberpunk" -> R.string.theme_cyberpunk_sub
     "editorial" -> R.string.theme_editorial_sub
-    "grindhouse" -> R.string.theme_grindhouse_sub
+    "channelz", "grindhouse" -> R.string.theme_grindhouse_sub
     else -> R.string.theme_cinematic_sub
 }
 

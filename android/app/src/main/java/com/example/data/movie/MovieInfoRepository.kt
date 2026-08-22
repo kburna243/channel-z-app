@@ -501,20 +501,36 @@ class MovieInfoRepository(
     }
 
     private fun imdbSearch(term: String): List<ImdbHit> {
-        val query = """query GrindhouseSearch(${'$'}t: String!) {
-            mainSearch(first: 8, options: {searchTerm: ${'$'}t, type: TITLE, includeAdult: false}) {
-                edges { node { entity { ... on Title {
-                    id
-                    titleText { text }
-                    titleType { text }
-                    releaseYear { year }
-                } } } }
+        val query = """query ChannelZSearch(${'$'}t: String!) {
+            mainSearch(first: 5, options: {searchTerm: ${'$'}t, type: [TITLE]}) {
+                edges {
+                    node {
+                        entity {
+                            ... on Title {
+                                id
+                                titleText { text }
+                                releaseYear { year }
+                                runtime { seconds }
+                                titleType { id }
+                            }
+                        }
+                    }
+                }
             }
-        }"""
-        val variables = JSONObject().put("t", term).toString()
-        val url = "https://caching.graphql.imdb.com/?operationName=GrindhouseSearch" +
-            "&query=${query.urlEncoded()}&variables=${variables.urlEncoded()}"
-        val body = httpGet(url, imdbHeaders) ?: return emptyList()
+        }""".trimIndent()
+        val variables = """{"t": "$term"}"""
+        val url = "https://caching.graphql.imdb.com/?operationName=ChannelZSearch" +
+            "&variables=" + java.net.URLEncoder.encode(variables, "UTF-8") +
+            "&extensions=" + java.net.URLEncoder.encode("""{"persistedQuery":{"version":1,"sha256Hash":"c9f59f6b92f7a09454e5b22b10a26e84d43615e4f454406a6c2f3d5ea4a61352"}}""", "UTF-8")
+
+        val req = Request.Builder()
+            .url(url)
+            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+            .header("Accept", "application/json")
+            .build()
+        val resp = client.newCall(req).execute()
+        if (!resp.isSuccessful) return emptyList()
+        val body = resp.body?.string() ?: return emptyList()
 
         val edges = JSONObject(body).optJSONObject("data")
             ?.optJSONObject("mainSearch")?.optJSONArray("edges") ?: return emptyList()
@@ -576,6 +592,6 @@ class MovieInfoRepository(
     private companion object {
         // Wikimedia verlangt eine benennbare Kennung mit Kontaktmoeglichkeit.
         const val USER_AGENT =
-            "Mikes420Grindhouse/1.2 (https://github.com/kburna243/mikes-cytube-dist)"
+            "ChannelZ-App/1.0 (https://github.com/kburna243/channel-z-app)"
     }
 }

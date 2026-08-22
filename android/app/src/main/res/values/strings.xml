@@ -72,7 +72,7 @@
     <string name="label_always">Always</string>
     <string name="settings_chat_theme">Chat Color Theme</string>
     <string name="settings_chat_theme_classic">Classic (CyTube original)</string>
-    <string name="settings_chat_theme_grindhouse">Grindhouse (Purple)</string>
+    <string name="settings_chat_theme_grindhouse">Channel-Z (Purple)</string>
     <string name="status_disconnected">Disconnected from CyTube • Press to Retry</string>
     <string name="status_connecting">Connecting to live feed…</string>
     <string name="status_live_feed">Cult Cinema Live Feed</string>
@@ -109,10 +109,18 @@
     <string name="remote_hint_left">◄ Details</string>
     <string name="details_year">Year</string>
     <string name="details_runtime">Runtime</string>
+    <string name="details_duration">Runtime</string>
     <string name="details_director">Director</string>
     <string name="details_genre">Genre</string>
     <string name="details_rating">Rating</string>
+    <string name="details_no_meta">No additional metadata found for this title.</string>
     <string name="trivia_section">TRIVIA</string>
+    <string name="trivia_section_trivia">Trivia</string>
+    <string name="trivia_section_goofs">Goofs</string>
+    <string name="trivia_section_quotes">Memorable Quote</string>
+    <string name="trivia_loading">Loading metadata…</string>
+    <string name="details_full_plot">Read Full Plot</string>
+    <string name="details_full_plot_dialog_title">Plot Summary</string>
     <string name="chat_login_title">Sign in to CyTube</string>
     <string name="chat_login_hint">The channel only accepts messages from signed-in users.</string>
     <string name="chat_username">Username</string>
@@ -150,8 +158,8 @@
     <string name="theme_cyberpunk_sub">Bold and cool — for live events and clips</string>
     <string name="theme_editorial">Mystic Editorial</string>
     <string name="theme_editorial_sub">Warm and calm — for documentaries and arthouse</string>
-    <string name="theme_grindhouse">Grindhouse Original</string>
-    <string name="theme_grindhouse_sub">The familiar look with the blue accent</string>
+    <string name="theme_grindhouse">Channel-Z Original</string>
+    <string name="theme_grindhouse_sub">The familiar look with the purple accent</string>
     <!-- Problem melden -->
     <string name="settings_bug_report">Report a problem</string>
     <string name="settings_bug_report_sub">Sends device and version along automatically</string>

@@ -38,9 +38,7 @@ class UpdateManager(private val context: Context) {
      * im DNS nicht und hat nur einen Timeout gekostet.
      */
     private val versionEndpoints = listOf(
-        "https://raw.githubusercontent.com/kburna243/mikes-420grindhouse-app/main/version.json",
-        "https://raw.githubusercontent.com/kburna243/mikes-cytube-dist/main/version.json",
-        "https://servermitte.tailecbf0f.ts.net/mca/version.json"
+        "https://raw.githubusercontent.com/kburna243/channel-z-app/main/version.json"
     )
 
     /**
@@ -102,7 +100,7 @@ class UpdateManager(private val context: Context) {
                 Log.d("UpdateManager", "Checking update from $url ...")
                 val request = Request.Builder()
                     .url(url)
-                    .header("User-Agent", "Mozilla/5.0 (Linux; Android 10; K) MCA-Client/1.0.7")
+                    .header("User-Agent", "ChannelZ-Client/1.0")
                     .build()
                 val resp = http.newCall(request).execute()
                 if (resp.isSuccessful) {
@@ -111,8 +109,6 @@ class UpdateManager(private val context: Context) {
                     val j = JSONObject(body)
                     // Jede Ausgabe laedt ihre eigene APK: die Full-Ausgabe die
                     // Handy-Fassung mit Chat, die Light-Ausgabe die TV-Fassung.
-                    // Vorher griffen beide zur lightUrl — das Update der Full-Ausgabe
-                    // haette eine APK mit anderer Anwendungs-ID installiert.
                     val apkUrl = if (BuildConfig.HAS_CHAT_INPUT) {
                         j.optString("url", j.optString("lightUrl", ""))
                     } else {
@@ -142,12 +138,12 @@ class UpdateManager(private val context: Context) {
     suspend fun downloadAndInstall(info: UpdateInfo): Intent? = withContext(Dispatchers.IO) {
         try {
             Log.d("UpdateManager", "Downloading update APK from ${info.apkUrl} ...")
-            val apkFile = File(context.cacheDir, "mca-update.apk")
+            val apkFile = File(context.cacheDir, "channelz-update.apk")
             if (apkFile.exists()) apkFile.delete()
 
             val request = Request.Builder()
                 .url(info.apkUrl)
-                .header("User-Agent", "Mozilla/5.0 (Linux; Android 10; K) MCA-Client/1.0.7")
+                .header("User-Agent", "ChannelZ-Client/1.0")
                 .build()
 
             val resp = http.newCall(request).execute()

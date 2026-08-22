@@ -57,7 +57,7 @@ fun SubtitleChatOverlay(
     maxLines: Int = 3,
     backgroundOpacity: Float = 0.60f,
     fontSizeSp: Int = 15,
-    chatTheme: String = "grindhouse",
+    chatTheme: String = "channelz",
     emotes: List<ChannelEmote> = emptyList(),
     modifier: Modifier = Modifier
 ) {
@@ -100,7 +100,7 @@ private fun SingleSubtitleLine(
     message: ChatMessage,
     backgroundOpacity: Float,
     fontSizeSp: Int,
-    chatTheme: String = "grindhouse",
+    chatTheme: String = "channelz",
     emotes: Map<String, String> = emptyMap()
 ) {
     val strongSubtitleShadow = Shadow(
@@ -110,7 +110,7 @@ private fun SingleSubtitleLine(
     )
 
     val hash = message.username.hashCode()
-    // Feature #4: zwei Farb-Palettes — Grindhouse (Purple/IceBlue/Coral) vs Classic (CyTube-Original: Cyan/Orange/Green)
+    // Zwei Farb-Paletten: Channel-Z (Purple/IceBlue/Coral) vs Classic (CyTube-Original: Cyan/Orange/Green)
     val nameColor = when {
         message.isSystem -> if (chatTheme == "classic") ClassicSystem else AccentVibrantOrange
         message.userRank >= 3 -> if (chatTheme == "classic") ClassicAmber else AccentLavender

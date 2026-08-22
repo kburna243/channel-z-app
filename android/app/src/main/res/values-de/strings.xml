@@ -73,7 +73,7 @@
     <string name="label_always">Dauerhaft</string>
     <string name="settings_chat_theme">Chat-Farbthema</string>
     <string name="settings_chat_theme_classic">Classic (CyTube-Original)</string>
-    <string name="settings_chat_theme_grindhouse">Grindhouse (Lila)</string>
+    <string name="settings_chat_theme_grindhouse">Channel-Z (Lila)</string>
     <string name="status_disconnected">Verbindung zu CyTube getrennt • Zum Wiederholen drücken</string>
     <string name="status_connecting">Verbinde mit Live-Feed…</string>
     <string name="status_live_feed">Cult-Cinema-Live-Feed</string>
@@ -151,8 +151,8 @@
     <string name="theme_cyberpunk_sub">Kräftig und kühl — für Live-Events und Clips</string>
     <string name="theme_editorial">Mystic Editorial</string>
     <string name="theme_editorial_sub">Warm und ruhig — für Dokus und Arthouse</string>
-    <string name="theme_grindhouse">Grindhouse Original</string>
-    <string name="theme_grindhouse_sub">Das gewohnte Bild mit dem blauen Akzent</string>
+    <string name="theme_grindhouse">Channel-Z Original</string>
+    <string name="theme_grindhouse_sub">Das gewohnte Bild mit dem lila Akzent</string>
     <!-- Problem melden -->
     <string name="settings_bug_report">Problem melden</string>
     <string name="settings_bug_report_sub">Gerät und Version gehen automatisch mit</string>

@@ -125,8 +125,7 @@ class CyTubeSocketClient(
     private fun resolveSocketServerUrl(room: String): String {
         val userAgent = "Mozilla/5.0 (Linux; Android 11; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36"
         val endpoints = listOf(
-            "https://cytu.be/socketconfig/$room.json",
-            "https://cytube.420grindhouse.org/socketconfig/$room.json"
+            "https://cytu.be/socketconfig/$room.json"
         )
 
         for (endpoint in endpoints) {
@@ -468,7 +467,7 @@ class CyTubeSocketClient(
 
     private fun handleMediaChange(data: JSONObject) {
         val id = data.optString("id", "")
-        val title = data.optString("title", "420 Grindhouse Live")
+        val title = data.optString("title", "Channel-Z Live")
         val duration = data.optDouble("seconds", data.optDouble("duration", 0.0))
         val type = data.optString("type", "raw")
         val currentTime = data.optDouble("currentTime", data.optDouble("time", 0.0))

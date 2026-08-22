@@ -151,7 +151,7 @@ val Palettes = listOf(
     ),
     // Der bisherige Look, damit niemand das gewohnte Bild verliert.
     ThemePalette(
-        id = "grindhouse",
+        id = "channelz",
         background = Color(0xFF050505),
         surface = Color(0xFF141418),
         surfaceCard = Color(0xFF1A1A22),

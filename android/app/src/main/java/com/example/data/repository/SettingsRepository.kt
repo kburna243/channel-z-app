@@ -75,7 +75,7 @@ class SettingsRepository(context: Context) {
     }
 
     fun updateChatTheme(theme: String) {
-        val t = if (theme == "classic") "classic" else "grindhouse"
+        val t = if (theme == "classic") "classic" else "channelz"
         updateSettings { it.copy(chatTheme = t) }
     }
 

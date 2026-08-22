@@ -55,7 +55,7 @@ import com.example.ui.theme.SurfaceDark
 @Composable
 fun VortexBackground(
     modifier: Modifier = Modifier,
-    titleText: String = "420 GRINDHOUSE",
+    titleText: String = "CHANNEL-Z",
     subtitleText: String? = null,
     showAnimation: Boolean = true
 ) {

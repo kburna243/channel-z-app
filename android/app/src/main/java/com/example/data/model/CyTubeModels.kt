@@ -140,7 +140,7 @@ data class AppSettings(
     val isMuted: Boolean = false,
     val subtitlesEnabled: Boolean = true,
     val chatAutoHideSeconds: Int = 0,       // 0 = dauerhaft sichtbar, >0 = Sekunden bis Auto-Hide
-    val chatTheme: String = "grindhouse",  // "grindhouse" | "classic"
+    val chatTheme: String = "channelz",  // "channelz" | "classic"
     // Farbthema der gesamten Oberflaeche; gueltige Werte stehen in ui/theme/Color.kt
     val appTheme: String = "cinematic",
     val movieInfoEnabled: Boolean = true,
