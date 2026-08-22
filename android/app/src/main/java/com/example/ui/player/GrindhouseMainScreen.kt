@@ -228,14 +228,11 @@ fun GrindhouseMainScreen(
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            // Mobil ist der Bildschirm niedriger — mit dem TV-Versatz von
-                            // 160 dp sass der Kreisel im Querformat fast am unteren Rand.
-                            modifier = Modifier.padding(top = if (isTv) 160.dp else 96.dp)
+                            modifier = Modifier.padding(top = if (isTv) 120.dp else 64.dp)
                         ) {
-                            CircularProgressIndicator(
-                                color = AccentLavender,
-                                strokeWidth = 3.dp,
-                                modifier = Modifier.size(36.dp)
+                            com.example.ui.components.ChannelZRetroLoadingBar(
+                                progress = 0.65f,
+                                modifier = Modifier.fillMaxWidth(if (isTv) 0.45f else 0.75f)
                             )
                         }
                     }
