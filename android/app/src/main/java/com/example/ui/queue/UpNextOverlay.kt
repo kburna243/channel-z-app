@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -139,87 +141,92 @@ fun UpNextOverlay(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    // Dedicated Reddit Schedule Text Box (if schedule announcement exists)
-                    if (isRedditFallback && !redditScheduleText.isNullOrBlank()) {
+                    // Dedicated Full Schedule / Announcement Text Box (scrollable)
+                    if (!redditScheduleText.isNullOrBlank()) {
+                        val scrollState = rememberScrollState()
                         Surface(
                             color = Color.Black.copy(alpha = 0.6f),
                             shape = RoundedCornerShape(8.dp),
                             border = BorderStroke(1.dp, SubtleBorder),
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .then(
+                                    if (queueItems.isEmpty()) Modifier.weight(1f)
+                                    else Modifier.height(180.dp)
+                                )
                                 .padding(bottom = 12.dp)
                         ) {
-                            Column(modifier = Modifier.padding(12.dp)) {
-                                run {
-                                    Text(
-                                        text = redditScheduleTitle?.takeIf { it.isNotBlank() }
-                                            ?: stringResource(R.string.epg_reddit_title_default),
-                                        style = TextStyle(
-                                            color = AccentIceBlue,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 12.sp
-                                        ),
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                }
+                            Column(
+                                modifier = Modifier
+                                    .padding(12.dp)
+                                    .verticalScroll(scrollState)
+                            ) {
                                 Text(
-                                    text = redditScheduleText.take(400) + if (redditScheduleText.length > 400) "…" else "",
+                                    text = redditScheduleTitle?.takeIf { it.isNotBlank() }
+                                        ?: stringResource(R.string.epg_reddit_title_default),
+                                    style = TextStyle(
+                                        color = AccentIceBlue,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 13.sp
+                                    )
+                                )
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text(
+                                    text = redditScheduleText,
                                     style = TextStyle(
                                         color = TextSubtitleWhite,
-                                        fontSize = 11.sp,
-                                        lineHeight = 15.sp,
+                                        fontSize = 12.sp,
+                                        lineHeight = 17.sp,
                                         fontFamily = FontFamily.Monospace
-                                    ),
-                                    maxLines = 5,
-                                    overflow = TextOverflow.Ellipsis
+                                    )
                                 )
                             }
                         }
                     }
 
-                    // Table Column Headers
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(SurfaceCard, RoundedCornerShape(6.dp))
-                            .padding(horizontal = 10.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.col_start_time),
-                            style = TextStyle(
-                                color = AccentLavender,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp,
-                                letterSpacing = 1.sp
-                            ),
-                            modifier = Modifier.width(68.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.col_title),
-                            style = TextStyle(
-                                color = AccentLavender,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp,
-                                letterSpacing = 1.sp
-                            ),
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = stringResource(R.string.col_duration),
-                            style = TextStyle(
-                                color = AccentLavender,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp,
-                                letterSpacing = 1.sp
-                            ),
-                            modifier = Modifier.width(56.dp)
-                        )
-                    }
+                    // Table Column Headers & Queue (if queueItems available)
+                    if (queueItems.isNotEmpty()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(SurfaceCard, RoundedCornerShape(6.dp))
+                                .padding(horizontal = 10.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.col_start_time),
+                                style = TextStyle(
+                                    color = AccentLavender,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp,
+                                    letterSpacing = 1.sp
+                                ),
+                                modifier = Modifier.width(68.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.col_title),
+                                style = TextStyle(
+                                    color = AccentLavender,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp,
+                                    letterSpacing = 1.sp
+                                ),
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text = stringResource(R.string.col_duration),
+                                style = TextStyle(
+                                    color = AccentLavender,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 10.sp,
+                                    letterSpacing = 1.sp
+                                ),
+                                modifier = Modifier.width(56.dp)
+                            )
+                        }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
 
                     // Table Content List
                     if (queueItems.isEmpty() && redditScheduleText.isNullOrBlank()) {
@@ -237,7 +244,7 @@ fun UpNextOverlay(
                                 )
                             )
                         }
-                    } else {
+                    } else if (queueItems.isNotEmpty()) {
                         LazyColumn(
                             modifier = Modifier
                                 .fillMaxWidth()
