@@ -136,6 +136,13 @@ Pre-built binaries are available directly under [Releases](https://github.com/kb
 
 ---
 
+## 👥 Authors & Co-Creators
+
+* **Fried ([@kburna243](https://github.com/kburna243))** – Core Development, Architecture & Android Engineering
+* **Mike** – Co-Creator, Concept & Testing
+
+---
+
 ## 🤝 Credits & Acknowledgements
 
 * **[calzoneman/sync](https://github.com/calzoneman/sync):** Thank you for the CyTube foundation and WebSocket protocol.
