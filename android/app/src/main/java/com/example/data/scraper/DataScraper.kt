@@ -31,7 +31,7 @@ data class MetadataOverlayState(
     val nowPlaying: MediaItem? = null,
     val upNext: List<MediaItem> = emptyList(),
     val queueItems: List<QueueScheduleItem> = emptyList(),
-    val channelName: String = "420Grindhouse",
+    val channelName: String = "Channel-Z",
     val userCount: Int = 0,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,

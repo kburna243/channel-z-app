@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class SettingsRepository(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("grindhouse_prefs", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences("channelz_prefs", Context.MODE_PRIVATE)
 
     private val _settings = MutableStateFlow(loadSettings())
     val settings: StateFlow<AppSettings> = _settings.asStateFlow()
@@ -22,12 +22,12 @@ class SettingsRepository(context: Context) {
             chatBackgroundOpacity = prefs.getFloat("chat_opacity", 0.15f),
             chatFontSizeSp = prefs.getInt("chat_font_size", 16),
             languageCode = prefs.getString("language_code", "system") ?: "system",
-            roomName = prefs.getString("room_name", "420Grindhouse") ?: "420Grindhouse",
+            roomName = prefs.getString("room_name", "Channel-Z") ?: "Channel-Z",
             customStreamUrl = prefs.getString("custom_stream_url", "") ?: "",
             safeZoneEnabled = prefs.getBoolean("safe_zone", true),
             subtitlesEnabled = prefs.getBoolean("subtitles_enabled", true),
             chatAutoHideSeconds = prefs.getInt("chat_auto_hide_seconds", 0),
-            chatTheme = prefs.getString("chat_theme", "grindhouse") ?: "grindhouse",
+            chatTheme = prefs.getString("chat_theme", "channelz") ?: "channelz",
             appTheme = prefs.getString("app_theme", DefaultPaletteId) ?: DefaultPaletteId,
             // Fehlten bisher beim Laden und Speichern: beide Schalter sprangen nach jedem
             // Neustart auf "an" zurueck, egal was eingestellt war.

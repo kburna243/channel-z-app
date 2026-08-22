@@ -554,7 +554,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     fun playDemoStream() {
         val demoItem = MediaItem(
             id = "dQw4w9WgXcQ",
-            title = "420 Grindhouse Demo Feed",
+            title = "Channel-Z Demo Feed",
             durationSeconds = 212.0,
             type = "yt",
             url = "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
