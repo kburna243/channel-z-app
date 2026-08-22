@@ -14,11 +14,11 @@ android {
   compileSdk { version = release(36) { minorApiLevel = 1 } }
 
   defaultConfig {
-    applicationId = "com.aistudio.grindhouse420.kxbz"
+    applicationId = "com.aistudio.channelz.kxbz"
     minSdk = 24
     targetSdk = 36
-    versionCode = 36
-    versionName = "1.6.8"
+    versionCode = 1
+    versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -32,14 +32,14 @@ android {
     create("light") {
       dimension = "edition"
       buildConfigField("Boolean", "HAS_CHAT_INPUT", "false")
-      resValue("string", "app_name", "Mikes 420 Grindhouse")
+      resValue("string", "app_name", "Channel-Z")
     }
     create("full") {
       dimension = "edition"
       applicationIdSuffix = ".full"
       versionNameSuffix = "-full"
       buildConfigField("Boolean", "HAS_CHAT_INPUT", "true")
-      resValue("string", "app_name", "Mikes 420 Grindhouse Full")
+      resValue("string", "app_name", "Channel-Z Full")
     }
   }
 

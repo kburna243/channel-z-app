@@ -50,7 +50,7 @@
     <string name="demo_stream_desc">Load test video (checks video and audio playback)</string>
     <string name="action_play">Play</string>
     <string name="action_retry">Retry</string>
-    <string name="exit_dialog_title">Exit Mikes 420 Grindhouse?</string>
+    <string name="exit_dialog_title">Exit Channel-Z?</string>
     <string name="exit_dialog_msg">Do you want to exit the player?</string>
     <string name="action_exit">Exit</string>
     <string name="action_cancel">Cancel</string>

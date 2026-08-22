@@ -51,7 +51,7 @@
     <string name="demo_stream_desc">Test-Video laden (prüft Video- und Audio-Wiedergabe)</string>
     <string name="action_play">Play</string>
     <string name="action_retry">Retry</string>
-    <string name="exit_dialog_title">Mikes 420 Grindhouse beenden?</string>
+    <string name="exit_dialog_title">Channel-Z beenden?</string>
     <string name="exit_dialog_msg">Möchtest du den Player verlassen?</string>
     <string name="action_exit">Beenden</string>
     <string name="action_cancel">Abbrechen</string>

@@ -54,7 +54,7 @@ class CyTubeSocketClient(
     private var pingRunnable: Runnable? = null
     private var reconnectRunnable: Runnable? = null
 
-    private var currentRoomName: String = "420Grindhouse"
+    private var currentRoomName: String = "Channel-Z"
     private var isIntentionallyClosed = false
     private var reconnectAttempt = 0
     private var lastPlaylistRequestMs = 0L
@@ -97,7 +97,7 @@ class CyTubeSocketClient(
 
     private val cachedPlaylist = mutableListOf<MediaItem>()
 
-    fun connect(roomName: String = "420Grindhouse", savedCredentials: Pair<String, String>? = null) {
+    fun connect(roomName: String = "Channel-Z", savedCredentials: Pair<String, String>? = null) {
         cancelReconnect()
         isIntentionallyClosed = false
         disconnectInternal()

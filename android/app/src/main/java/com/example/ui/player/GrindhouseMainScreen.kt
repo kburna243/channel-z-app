@@ -216,7 +216,7 @@ fun GrindhouseMainScreen(
 
                 VortexBackground(
                     modifier = Modifier.fillMaxSize(),
-                    titleText = "MIKES 420 GRINDHOUSE",
+                    titleText = "CHANNEL-Z",
                     subtitleText = subtitle,
                     showAnimation = isBuffering || connectionStatus == ConnectionStatus.RECONNECTING
                 )

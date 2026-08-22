@@ -134,7 +134,7 @@ data class AppSettings(
     val chatBackgroundOpacity: Float = 0.15f,
     val chatFontSizeSp: Int = 16,
     val languageCode: String = "system",
-    val roomName: String = "420Grindhouse",
+    val roomName: String = "Channel-Z",
     val customStreamUrl: String = "",
     val safeZoneEnabled: Boolean = true,
     val isMuted: Boolean = false,
