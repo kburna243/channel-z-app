@@ -2,8 +2,8 @@
 
 This project is created and maintained with passion by fans, for fans:
 
-* **Fried** ([@kburna243](https://github.com/kburna243)) – Core Development, Architecture & Android Engineering
-* **Mike** – Co-Creator, Concept, UX Direction & Testing
+* **Fried** ([@kburna243](https://github.com/kburna243)) – Core Development, System Architecture, UI Design & Android Engineering
+* **Mike** – Co-Development, Architecture, UI Design, Concept & Testing
 
 ## Special Thanks
 
