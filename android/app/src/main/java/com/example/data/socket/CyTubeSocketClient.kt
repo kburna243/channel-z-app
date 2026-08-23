@@ -392,6 +392,13 @@ class CyTubeSocketClient(
                     put("requestPlaylist")
                 }
                 socket.send("42$plPayload")
+
+                // Auto-login if credentials provided
+                credentials?.let { (user, pass) ->
+                    if (user.isNotBlank() && pass.isNotBlank()) {
+                        login(user, pass)
+                    }
+                }
             }, 300)
         } catch (e: Exception) {
             Log.e(TAG, "Error sending joinChannel", e)

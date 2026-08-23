@@ -14,12 +14,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CheckCircle
@@ -106,6 +109,8 @@ fun FirstRunLoginDialog(
         }
     }
 
+    val scrollState = rememberScrollState()
+
     Dialog(
         onDismissRequest = {
             if (otpState !is WebQueueOtpState.RequestingOtp && otpState !is WebQueueOtpState.Verifying) {
@@ -122,23 +127,25 @@ fun FirstRunLoginDialog(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.85f))
-                .padding(24.dp)
+                .padding(horizontal = 24.dp, vertical = 12.dp)
+                .imePadding()
                 .testTag("first_run_login_dialog"),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter
         ) {
             Surface(
                 modifier = Modifier
                     .fillMaxWidth(0.92f)
-                    .clip(RoundedCornerShape(20.dp)),
+                    .clip(RoundedCornerShape(16.dp)),
                 color = SurfaceDark.copy(alpha = 0.98f),
-                shape = RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(16.dp),
                 border = BorderStroke(1.5.dp, AccentPurple.copy(alpha = 0.6f)),
                 shadowElevation = 32.dp
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 28.dp, vertical = 24.dp),
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 24.dp, vertical = 14.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Header Logo & Badge
@@ -151,38 +158,38 @@ fun FirstRunLoginDialog(
                             style = TextStyle(
                                 color = PureWhite,
                                 fontWeight = FontWeight.ExtraBold,
-                                fontSize = 17.sp,
+                                fontSize = 15.sp,
                                 letterSpacing = 1.5.sp,
                                 fontFamily = FontFamily.Monospace
                             )
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = "WebQueue & CyTube Connect",
                         style = TextStyle(
                             color = AccentLavender,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                            fontSize = 17.sp
                         )
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(2.dp))
 
                     Text(
                         text = "Connect your account once to unlock real-time EPG schedules, upcoming movie marathons, and the interactive queue.",
                         style = TextStyle(
                             color = TextMuted,
-                            fontSize = 13.sp,
+                            fontSize = 12.sp,
                             textAlign = TextAlign.Center,
-                            lineHeight = 18.sp
+                            lineHeight = 15.sp
                         ),
-                        modifier = Modifier.padding(horizontal = 12.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(18.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     when (val state = otpState) {
                         is WebQueueOtpState.Idle, is WebQueueOtpState.Failed -> {
@@ -316,11 +323,11 @@ fun FirstRunLoginDialog(
                             ) {
                                 CircularProgressIndicator(
                                     color = AccentIceBlue,
-                                    modifier = Modifier.size(44.dp),
+                                    modifier = Modifier.size(40.dp),
                                     strokeWidth = 3.5.dp
                                 )
 
-                                Spacer(modifier = Modifier.height(18.dp))
+                                Spacer(modifier = Modifier.height(14.dp))
 
                                 Text(
                                     text = stepText,
@@ -332,58 +339,79 @@ fun FirstRunLoginDialog(
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(6.dp))
 
                                 Text(
-                                    text = "The bot Kryten sends a PM in CyTube. The app detects and verifies it automatically.",
+                                    text = "Kryten hat dir einen 6-stelligen Code per PM im CyTube-Chat geschickt. Der Code wird automatisch erkannt – oder du kannst ihn hier direkt eingeben:",
                                     style = TextStyle(
                                         color = TextMuted,
                                         fontSize = 12.sp,
-                                        textAlign = TextAlign.Center
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 16.sp
                                     )
                                 )
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(14.dp))
 
-                                // Manual fallback toggle
-                                if (!showManualCodeInput) {
-                                    OutlinedButton(
-                                        onClick = { showManualCodeInput = true },
-                                        shape = RoundedCornerShape(10.dp),
-                                        border = BorderStroke(1.dp, SubtleBorder)
-                                    ) {
-                                        Text("Enter 6-digit code manually", fontSize = 12.sp, color = TextSubtitleWhite)
-                                    }
-                                } else {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        OutlinedTextField(
-                                            value = manualCode,
-                                            onValueChange = { if (it.length <= 6) manualCode = it },
-                                            placeholder = { Text("6-digit code") },
-                                            singleLine = true,
-                                            modifier = Modifier.weight(1f),
-                                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                            colors = OutlinedTextFieldDefaults.colors(
-                                                focusedBorderColor = AccentPurple,
-                                                unfocusedBorderColor = SubtleBorder,
-                                                focusedTextColor = PureWhite,
-                                                unfocusedTextColor = PureWhite
-                                            )
+                                // Always-visible 6-digit code entry with auto-submit
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    OutlinedTextField(
+                                        value = manualCode,
+                                        onValueChange = { input ->
+                                            val digitsOnly = input.filter { it.isDigit() }.take(6)
+                                            manualCode = digitsOnly
+                                            if (digitsOnly.length == 6) {
+                                                onVerifyManualOtp(username, digitsOnly)
+                                            }
+                                        },
+                                        placeholder = { Text("6-stelliger Code (z.B. 123456)") },
+                                        singleLine = true,
+                                        modifier = Modifier.weight(1f),
+                                        keyboardOptions = KeyboardOptions(
+                                            keyboardType = KeyboardType.Number,
+                                            imeAction = ImeAction.Done
+                                        ),
+                                        keyboardActions = KeyboardActions(
+                                            onDone = {
+                                                if (manualCode.length == 6) {
+                                                    onVerifyManualOtp(username, manualCode)
+                                                }
+                                            }
+                                        ),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedBorderColor = AccentPurple,
+                                            unfocusedBorderColor = SubtleBorder,
+                                            focusedTextColor = PureWhite,
+                                            unfocusedTextColor = PureWhite,
+                                            cursorColor = AccentIceBlue
                                         )
+                                    )
 
-                                        Button(
-                                            onClick = { onVerifyManualOtp(username, manualCode) },
-                                            enabled = manualCode.length == 6,
-                                            shape = RoundedCornerShape(10.dp),
-                                            colors = ButtonDefaults.buttonColors(containerColor = AccentPurple)
-                                        ) {
-                                            Text("Verify")
-                                        }
+                                    Button(
+                                        onClick = { onVerifyManualOtp(username, manualCode) },
+                                        enabled = manualCode.length == 6,
+                                        shape = RoundedCornerShape(10.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = AccentPurple,
+                                            disabledContainerColor = AccentPurple.copy(alpha = 0.3f)
+                                        )
+                                    ) {
+                                        Text("Verify", fontWeight = FontWeight.Bold)
                                     }
+                                }
+
+                                Spacer(modifier = Modifier.height(10.dp))
+
+                                OutlinedButton(
+                                    onClick = onSkip,
+                                    shape = RoundedCornerShape(10.dp),
+                                    border = BorderStroke(1.dp, SubtleBorder)
+                                ) {
+                                    Text("Skip / Watch as Guest", fontSize = 12.sp, color = TextSubtitleWhite)
                                 }
                             }
                         }
