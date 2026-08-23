@@ -98,6 +98,12 @@ class CyTubeSocketClient(
     private val _mediaSyncEvent = MutableSharedFlow<MediaSyncUpdate>(replay = 1, extraBufferCapacity = 16)
     val mediaSyncEvent: SharedFlow<MediaSyncUpdate> = _mediaSyncEvent.asSharedFlow()
 
+    private val _privateMessageEvent = MutableSharedFlow<com.example.data.model.PrivateMessage>(replay = 0, extraBufferCapacity = 16)
+    val privateMessageEvent: SharedFlow<com.example.data.model.PrivateMessage> = _privateMessageEvent.asSharedFlow()
+
+    private val _magicOtpCodeEvent = MutableSharedFlow<String>(replay = 0, extraBufferCapacity = 8)
+    val magicOtpCodeEvent: SharedFlow<String> = _magicOtpCodeEvent.asSharedFlow()
+
     private val cachedPlaylist = mutableListOf<MediaItem>()
 
     fun connect(roomName: String = "Channel-Z", savedCredentials: Pair<String, String>? = null) {
@@ -241,6 +247,10 @@ class CyTubeSocketClient(
                         "chatMsg" -> {
                             val data = eventArray.optJSONObject(1)
                             if (data != null) handleIncomingChat(data)
+                        }
+                        "pm" -> {
+                            val data = eventArray.optJSONObject(1)
+                            if (data != null) handleIncomingPm(data)
                         }
                         "changeMedia", "setCurrent" -> {
                             val data = eventArray.optJSONObject(1)
@@ -465,6 +475,34 @@ class CyTubeSocketClient(
         }
     }
 
+    private fun handleIncomingPm(data: JSONObject) {
+        val from = data.optString("username", data.optString("from", "System"))
+        val rawMsg = data.optString("msg", data.optString("text", ""))
+        val time = data.optLong("time", System.currentTimeMillis())
+        val to = data.optString("to", "")
+        val cleanMsg = rawMsg.replace(Regex("<[^>]*>"), "").trim()
+
+        if (cleanMsg.isNotEmpty()) {
+            val pm = com.example.data.model.PrivateMessage(
+                from = from,
+                text = cleanMsg,
+                timestamp = time,
+                to = to
+            )
+            _privateMessageEvent.tryEmit(pm)
+            Log.d(TAG, "PM received from $from: $cleanMsg")
+
+            // Magic OTP Auto-Extraction: Detect 6-digit code from Kryten / WebQueue bot
+            val otpRegex = Regex("""\b(\d{6})\b""")
+            val match = otpRegex.find(cleanMsg)
+            if (match != null) {
+                val code = match.groupValues[1]
+                Log.i(TAG, "✨ Magic OTP Code extracted from PM ($from): $code")
+                _magicOtpCodeEvent.tryEmit(code)
+            }
+        }
+    }
+
     private fun handleMediaChange(data: JSONObject) {
         val id = data.optString("id", "")
         val title = data.optString("title", "Channel-Z Live")
@@ -530,7 +568,8 @@ class CyTubeSocketClient(
                 val mediaId = mediaObj.optString("id", "")
                 val uid = entry?.optString("uid", "") ?: ""
                 val id = mediaId.ifBlank { uid.ifBlank { i.toString() } }
-                val title = mediaObj.optString("title", entry?.optString("title", "Upcoming Video"))
+                val fallbackTitle = entry?.optString("title", "Upcoming Video") ?: "Upcoming Video"
+                val title = mediaObj.optString("title", fallbackTitle)
                 val type = mediaObj.optString("type", "raw")
                 val direct = parseDirectUrlFromData(mediaObj)
                 items.add(

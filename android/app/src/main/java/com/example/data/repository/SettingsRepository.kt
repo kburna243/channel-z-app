@@ -104,4 +104,25 @@ class SettingsRepository(context: Context) {
             .remove("chat_password")
             .apply()
     }
+
+    // -------------------------------------------------- WebQueue & First-Run Setup
+    fun isFirstRunCompleted(): Boolean {
+        return prefs.getBoolean("first_run_completed", false)
+    }
+
+    fun setFirstRunCompleted(completed: Boolean) {
+        prefs.edit().putBoolean("first_run_completed", completed).apply()
+    }
+
+    fun webQueueCookies(): String? {
+        return prefs.getString("webqueue_cookies", null)
+    }
+
+    fun saveWebQueueCookies(cookiesJson: String) {
+        prefs.edit().putString("webqueue_cookies", cookiesJson).apply()
+    }
+
+    fun clearWebQueueCookies() {
+        prefs.edit().remove("webqueue_cookies").apply()
+    }
 }

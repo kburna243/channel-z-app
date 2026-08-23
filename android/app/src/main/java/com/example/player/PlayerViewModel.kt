@@ -24,8 +24,11 @@ import com.example.data.scraper.DataScraper
 import com.example.data.scraper.MetadataOverlayState
 import com.example.data.socket.CyTubeSocketClient
 import com.example.ui.player.extractYouTubeId
+import com.example.data.model.WebQueueOtpState
+import com.example.data.webqueue.WebQueueApiClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -52,6 +55,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
 
     private val socketClient = CyTubeSocketClient(viewModelScope)
     val dataScraper = DataScraper(viewModelScope)
+    val webQueueClient = WebQueueApiClient(settingsRepo)
     private val movieInfoRepo = MovieInfoRepository()
 
     private val _movieInfo = MutableStateFlow<MovieInfo?>(null)
@@ -64,6 +68,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     val isTriviaLoading: StateFlow<Boolean> = _isTriviaLoading.asStateFlow()
 
     private var movieInfoJob: Job? = null
+    private var webQueuePollingJob: Job? = null
 
     val connectionStatus: StateFlow<ConnectionStatus> = socketClient.connectionStatus
     val nowPlaying: StateFlow<MediaItem?> = socketClient.nowPlaying
@@ -76,15 +81,24 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     val queueScheduleItems: StateFlow<List<QueueScheduleItem>> = dataScraper.queueScheduleItems
     val mediaSyncEvent: SharedFlow<MediaSyncUpdate> = socketClient.mediaSyncEvent
 
+    private val _otpState = MutableStateFlow<WebQueueOtpState>(WebQueueOtpState.Idle)
+    val otpState: StateFlow<WebQueueOtpState> = _otpState.asStateFlow()
+
+    private val _isFirstRunDialogOpen = MutableStateFlow(!settingsRepo.isFirstRunCompleted() && settingsRepo.chatCredentials() == null)
+    val isFirstRunDialogOpen: StateFlow<Boolean> = _isFirstRunDialogOpen.asStateFlow()
+
+    private val _webQueueScheduleItems = MutableStateFlow<List<QueueScheduleItem>>(emptyList())
+    val webQueueScheduleItems: StateFlow<List<QueueScheduleItem>> = _webQueueScheduleItems.asStateFlow()
+
+    private val _webQueueNextSchedule = MutableStateFlow<String?>(null)
+    val webQueueNextSchedule: StateFlow<String?> = _webQueueNextSchedule.asStateFlow()
+
     val metadataOverlayState: StateFlow<MetadataOverlayState> = combine(
         socketClient.nowPlaying,
         socketClient.upNext,
         socketClient.playlist,
-        dataScraper.scheduleItems,
-        dataScraper.queueScheduleItems,
-        dataScraper.redditScheduleTitle,
-        dataScraper.redditScheduleText,
-        dataScraper.isRedditFallback,
+        _webQueueScheduleItems,
+        _webQueueNextSchedule,
         socketClient.userCount,
         socketClient.motd,
         settings
@@ -95,21 +109,26 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         @Suppress("UNCHECKED_CAST")
         val socketPlaylist = args[2] as? List<MediaItem> ?: emptyList()
         @Suppress("UNCHECKED_CAST")
-        val scheduleNext = args[3] as? List<MediaItem> ?: emptyList()
-        @Suppress("UNCHECKED_CAST")
-        val scrapedQueueItems = args[4] as? List<QueueScheduleItem> ?: emptyList()
-        val redditTitle = args[5] as? String
-        val redditText = args[6] as? String
-        val isReddit = args[7] as? Boolean ?: false
-        val users = args[8] as? Int ?: 0
-        val motdText = args[9] as? String
-        val cfg = args[10] as? AppSettings ?: AppSettings()
+        val webQueueItems = args[3] as? List<QueueScheduleItem> ?: emptyList()
+        val webNextSched = args[4] as? String
+        val users = args[5] as? Int ?: 0
+        val motdText = args[6] as? String
+        val cfg = args[7] as? AppSettings ?: AppSettings()
 
         val socketCandidates = if (socketNext.isNotEmpty()) socketNext else socketPlaylist
         val socketQueue = buildQueueScheduleFromSocket(now, socketCandidates)
 
-        val finalNext = socketNext
-        val finalQueueItems = socketQueue
+        val finalNext = if (socketNext.isNotEmpty()) socketNext else webQueueItems.map {
+            MediaItem(id = it.mediaId, title = it.title, durationSeconds = it.durationSeconds.toDouble())
+        }
+        val finalQueueItems = if (webQueueItems.isNotEmpty()) webQueueItems else socketQueue
+
+        val scheduleTitle = when {
+            !webNextSched.isNullOrBlank() -> "Upcoming Schedule"
+            !motdText.isNullOrBlank() -> "Channel-Z Room MOTD"
+            else -> null
+        }
+        val scheduleText = webNextSched ?: motdText
 
         MetadataOverlayState(
             nowPlaying = now,
@@ -118,9 +137,9 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             channelName = cfg.roomName,
             userCount = users,
             isLoading = now == null,
-            redditScheduleTitle = if (!motdText.isNullOrBlank()) "Channel-Z Room MOTD" else null,
-            redditScheduleText = motdText,
-            isRedditFallback = !motdText.isNullOrBlank()
+            redditScheduleTitle = scheduleTitle,
+            redditScheduleText = scheduleText,
+            isRedditFallback = !scheduleText.isNullOrBlank()
         )
     }.stateIn(
         scope = viewModelScope,
@@ -196,6 +215,38 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
                     pendingCredentials = null
                 }
             }
+        }
+
+        // Magic WebQueue OTP Listener: Automatisches Abfangen des Kryten-Bestätigungscodes
+        viewModelScope.launch {
+            socketClient.magicOtpCodeEvent.collect { code ->
+                val currentOtpState = _otpState.value
+                val username = when (currentOtpState) {
+                    is WebQueueOtpState.WaitingForCode -> currentOtpState.username
+                    is WebQueueOtpState.RequestingOtp -> pendingCredentials?.first ?: _savedChatUsername.value
+                    else -> pendingCredentials?.first ?: _savedChatUsername.value
+                }.ifBlank { _savedChatUsername.value }
+
+                if (username.isNotBlank() && code.isNotBlank()) {
+                    Log.i(TAG, "✨ Magic OTP triggered for '$username' with code '$code'")
+                    _otpState.value = WebQueueOtpState.Verifying(username, code)
+                    val verifyResult = webQueueClient.verifyOtp(username, code)
+                    if (verifyResult.isSuccess) {
+                        Log.i(TAG, "🎉 WebQueue Magic Login successful!")
+                        _otpState.value = WebQueueOtpState.Success(username)
+                        settingsRepo.setFirstRunCompleted(true)
+                        startWebQueuePolling()
+                    } else {
+                        val err = verifyResult.exceptionOrNull()?.message ?: "OTP verification failed"
+                        _otpState.value = WebQueueOtpState.Failed(err)
+                    }
+                }
+            }
+        }
+
+        // Start WebQueue polling if already authenticated
+        if (webQueueClient.hasValidSession()) {
+            startWebQueuePolling()
         }
 
         // Initial auto-hide timer for Remote Hints (6s on startup)
@@ -364,6 +415,101 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         settingsRepo.clearChatCredentials()
         _savedChatUsername.value = ""
         socketClient.logout()
+        webQueueClient.logout()
+        _webQueueScheduleItems.value = emptyList()
+        _webQueueNextSchedule.value = null
+        webQueuePollingJob?.cancel()
+        _otpState.value = WebQueueOtpState.Idle
+    }
+
+    /**
+     * Startet den Magic Login:
+     * 1. Verbindet / meldet den CyTube-Chat an.
+     * 2. Fordert den OTP-Code bei WebQueue (queue.dropsugar.co) an.
+     * 3. Kryten schickt den Code per PM -> Socket extrahiert den Code automatisch -> Verify!
+     */
+    fun startMagicLogin(username: String, password: String = "") {
+        val cleanName = username.trim()
+        if (cleanName.isBlank()) {
+            _otpState.value = WebQueueOtpState.Failed("Please enter your CyTube username")
+            return
+        }
+        _otpState.value = WebQueueOtpState.RequestingOtp
+        pendingCredentials = cleanName to password
+
+        viewModelScope.launch {
+            // 1. CyTube Socket verbinden / anmelden
+            socketClient.connect(settings.value.roomName, cleanName to password)
+            if (password.isNotBlank()) {
+                socketClient.login(cleanName, password)
+            }
+
+            // 2. OTP bei WebQueue anfordern (Kryten schickt PM)
+            val requestResult = webQueueClient.requestOtp(cleanName)
+            if (requestResult.isFailure) {
+                val err = requestResult.exceptionOrNull()?.message ?: "Failed to request code from WebQueue"
+                _otpState.value = WebQueueOtpState.Failed(err)
+                return@launch
+            }
+
+            _otpState.value = WebQueueOtpState.WaitingForCode(cleanName)
+        }
+    }
+
+    /** Manuelle Eingabe des 6-stelligen Codes, falls gewünscht. */
+    fun verifyManualOtp(username: String, code: String) {
+        val cleanName = username.trim().ifBlank { _savedChatUsername.value }
+        val cleanCode = code.trim()
+        if (cleanName.isBlank() || cleanCode.isBlank()) {
+            _otpState.value = WebQueueOtpState.Failed("Username and 6-digit code are required")
+            return
+        }
+        _otpState.value = WebQueueOtpState.Verifying(cleanName, cleanCode)
+        viewModelScope.launch {
+            val result = webQueueClient.verifyOtp(cleanName, cleanCode)
+            if (result.isSuccess) {
+                _otpState.value = WebQueueOtpState.Success(cleanName)
+                settingsRepo.setFirstRunCompleted(true)
+                startWebQueuePolling()
+            } else {
+                val err = result.exceptionOrNull()?.message ?: "Invalid or expired code"
+                _otpState.value = WebQueueOtpState.Failed(err)
+            }
+        }
+    }
+
+    fun dismissFirstRunDialog() {
+        _isFirstRunDialogOpen.value = false
+    }
+
+    fun skipFirstRun() {
+        settingsRepo.setFirstRunCompleted(true)
+        _isFirstRunDialogOpen.value = false
+    }
+
+    fun openAccountLoginDialog() {
+        _otpState.value = WebQueueOtpState.Idle
+        _isFirstRunDialogOpen.value = true
+    }
+
+    fun startWebQueuePolling() {
+        webQueuePollingJob?.cancel()
+        webQueuePollingJob = viewModelScope.launch {
+            while (isActive) {
+                val queueResult = webQueueClient.fetchQueueState()
+                if (queueResult.isSuccess) {
+                    val items = queueResult.getOrDefault(emptyList())
+                    if (items.isNotEmpty()) {
+                        _webQueueScheduleItems.value = items
+                    }
+                }
+                val nextScheduleResult = webQueueClient.fetchNextSchedule()
+                if (nextScheduleResult.isSuccess) {
+                    _webQueueNextSchedule.value = nextScheduleResult.getOrNull()
+                }
+                delay(15000L)
+            }
+        }
     }
 
     fun sendChat(message: String): Boolean = socketClient.sendChat(message)
