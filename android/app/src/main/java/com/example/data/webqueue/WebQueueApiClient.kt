@@ -210,6 +210,47 @@ class WebQueueApiClient(
         }
     }
 
+    /**
+     * Searches the Channel-Z catalog for movie/show details including IMDB tt number.
+     */
+    suspend fun searchCatalog(query: String): Result<com.example.data.model.CatalogItem?> = withContext(ioDispatcher) {
+        try {
+            val encoded = java.net.URLEncoder.encode(query.trim(), "UTF-8")
+            val request = Request.Builder()
+                .url("$BASE_URL/catalog/search?q=$encoded")
+                .get()
+                .header("User-Agent", "channelz-app")
+                .build()
+
+            val response = httpClient.newCall(request).execute()
+            val respBody = response.body?.string().orEmpty()
+
+            if (response.isSuccessful && respBody.isNotBlank()) {
+                val root = JSONObject(respBody)
+                val items = root.optJSONArray("items") ?: root.optJSONArray("results")
+                if (items != null && items.length() > 0) {
+                    val first = items.getJSONObject(0)
+                    val item = com.example.data.model.CatalogItem(
+                        friendlyToken = first.optString("friendly_token", first.optString("token")),
+                        title = first.optString("title"),
+                        description = first.optString("description").takeIf { it.isNotBlank() },
+                        durationSec = first.optInt("duration_sec", first.optInt("duration", 0)),
+                        imdbTt = first.optString("imdb_tt").takeIf { it.isNotBlank() },
+                        contentType = first.optString("content_type").takeIf { it.isNotBlank() },
+                        lookupYear = first.optInt("lookup_year").takeIf { it > 0 },
+                        category = first.optString("category").takeIf { it.isNotBlank() },
+                        posterUrl = first.optString("thumbnail_url", first.optString("poster_url")).takeIf { it.isNotBlank() }
+                    )
+                    return@withContext Result.success(item)
+                }
+            }
+            Result.success(null)
+        } catch (e: Exception) {
+            Log.w(TAG, "Error searching catalog for '$query': ${e.message}")
+            Result.failure(e)
+        }
+    }
+
     fun logout() {
         cookieStore.clear()
         settingsRepository.clearWebQueueCookies()

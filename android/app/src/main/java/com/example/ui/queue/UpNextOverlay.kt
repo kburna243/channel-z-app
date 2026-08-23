@@ -120,7 +120,9 @@ fun UpNextOverlay(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = if (isRedditFallback) stringResource(R.string.epg_queue_title_reddit) else stringResource(R.string.queue_title),
+                                text = if (queueItems.isNotEmpty()) "Channel-Z Live EPG"
+                                else if (isRedditFallback) stringResource(R.string.epg_queue_title_reddit)
+                                else stringResource(R.string.queue_title),
                                 style = TextStyle(
                                     color = PureWhite,
                                     fontWeight = FontWeight.Bold,
@@ -129,17 +131,19 @@ fun UpNextOverlay(
                                 )
                             )
                             Text(
-                                text = if (isRedditFallback) "Channel-Z Announcement" else "Channel-Z Live Playlist (cytu.be/r/Channel-Z)",
+                                text = if (queueItems.isNotEmpty()) "WebQueue Live Sendeplan • ${queueItems.size} Sendungen"
+                                else if (isRedditFallback) "Channel-Z Announcement"
+                                else "Channel-Z Live Playlist (cytu.be/r/Channel-Z)",
                                 style = TextStyle(
-                                    color = if (isRedditFallback) AccentVibrantOrange else TextMuted,
+                                    color = if (queueItems.isNotEmpty()) AccentLavender else if (isRedditFallback) AccentVibrantOrange else TextMuted,
                                     fontSize = 11.sp,
-                                    fontWeight = if (isRedditFallback) FontWeight.Medium else FontWeight.Normal
+                                    fontWeight = FontWeight.Medium
                                 )
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Dedicated Full Schedule / Announcement Text Box (scrollable)
                     if (!redditScheduleText.isNullOrBlank()) {
@@ -147,36 +151,36 @@ fun UpNextOverlay(
                         Surface(
                             color = Color.Black.copy(alpha = 0.6f),
                             shape = RoundedCornerShape(8.dp),
-                            border = BorderStroke(1.dp, SubtleBorder),
+                            border = BorderStroke(1.dp, if (isRedditFallback) AccentVibrantOrange.copy(alpha = 0.5f) else SubtleBorder),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .then(
                                     if (queueItems.isEmpty()) Modifier.weight(1f)
-                                    else Modifier.height(180.dp)
+                                    else Modifier.height(105.dp)
                                 )
-                                .padding(bottom = 12.dp)
+                                .padding(bottom = 8.dp)
                         ) {
                             Column(
                                 modifier = Modifier
-                                    .padding(12.dp)
+                                    .padding(10.dp)
                                     .verticalScroll(scrollState)
                             ) {
                                 Text(
                                     text = redditScheduleTitle?.takeIf { it.isNotBlank() }
-                                        ?: stringResource(R.string.epg_reddit_title_default),
+                                        ?: "🎬 Nächster Marathon / Ankündigung",
                                     style = TextStyle(
                                         color = AccentIceBlue,
                                         fontWeight = FontWeight.Bold,
-                                        fontSize = 13.sp
+                                        fontSize = 12.sp
                                     )
                                 )
-                                Spacer(modifier = Modifier.height(6.dp))
+                                Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = redditScheduleText,
                                     style = TextStyle(
                                         color = TextSubtitleWhite,
-                                        fontSize = 12.sp,
-                                        lineHeight = 17.sp,
+                                        fontSize = 11.sp,
+                                        lineHeight = 15.sp,
                                         fontFamily = FontFamily.Monospace
                                     )
                                 )

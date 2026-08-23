@@ -122,6 +122,30 @@ class MovieInfoRepository(
         enriched
     }
 
+    /**
+     * Resolves movie details directly using a known IMDb tt number (e.g. from WebQueue/MediaCMS catalog).
+     */
+    suspend fun lookupFromImdbId(imdbId: String, rawTitle: String): MovieInfo? = withContext(ioDispatcher) {
+        val cleanId = imdbId.trim()
+        if (cleanId.isBlank()) return@withContext null
+        val cacheKey = "imdb|$cleanId"
+        cache[cacheKey]?.let { return@withContext it }
+
+        val base = MovieInfo(
+            query = rawTitle,
+            title = rawTitle,
+            imdbId = cleanId
+        )
+        val enriched = try {
+            enrichViaImdb(base)
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to enrich from direct IMDb ID $cleanId: ${e.message}")
+            base
+        }
+        cache[cacheKey] = enriched
+        enriched
+    }
+
     /** Trivia wird erst geholt, wenn jemand sie sehen will — die Listen sind lang. */
     suspend fun loadTrivia(imdbId: String, limit: Int = 25): List<String> = withContext(ioDispatcher) {
         val query = """

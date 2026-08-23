@@ -129,6 +129,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             else -> null
         }
         val scheduleText = webNextSched ?: motdText
+        val isFallback = finalQueueItems.isEmpty() && !scheduleText.isNullOrBlank()
 
         MetadataOverlayState(
             nowPlaying = now,
@@ -139,7 +140,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             isLoading = now == null,
             redditScheduleTitle = scheduleTitle,
             redditScheduleText = scheduleText,
-            isRedditFallback = !scheduleText.isNullOrBlank()
+            isRedditFallback = isFallback
         )
     }.stateIn(
         scope = viewModelScope,
@@ -266,17 +267,28 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         if (!settings.value.movieInfoEnabled || rawTitle.isBlank()) return
 
         movieInfoJob = viewModelScope.launch {
-            // Bei YouTube zuerst dort nachfragen: Trailer und Bumper stehen in keiner
-            // Filmdatenbank, haben aber auf YouTube Titel, Kanal und Vorschaubild.
-            val fromYouTube = if (media?.type?.lowercase() == "yt") {
+            // 1. Zuerst WebQueue / Channel-Z Katalog abfragen (kennt exacten imdb_tt Code und Beschreibung)
+            val catalogResult = webQueueClient.searchCatalog(rawTitle)
+            val catalogItem = catalogResult.getOrNull()
+            val fromCatalog = if (catalogItem?.imdbTt != null) {
+                movieInfoRepo.lookupFromImdbId(catalogItem.imdbTt, catalogItem.title)
+            } else null
+
+            // 2. Bei YouTube zuerst dort nachfragen wenn type == yt
+            val fromYouTube = if (fromCatalog == null && media?.type?.lowercase() == "yt") {
                 movieInfoRepo.lookupYouTube(extractYouTubeId(media.id))
             } else null
 
-            val info = movieInfoRepo.lookup(rawTitle, useImdb = settings.value.imdbEnabled)
+            val info = fromCatalog
+                ?: movieInfoRepo.lookup(rawTitle, useImdb = settings.value.imdbEnabled)
                 ?: fromYouTube
+
             if (info != null) {
-                Log.d(TAG, "Filminfo gefunden: ${info.title} (${info.year}) imdb=${info.imdbId}")
-                _movieInfo.value = info
+                val finalInfo = if (info.plot.isNullOrBlank() && !catalogItem?.description.isNullOrBlank()) {
+                    info.copy(plot = catalogItem.description)
+                } else info
+                Log.d(TAG, "Filminfo gefunden: ${finalInfo.title} (${finalInfo.year}) imdb=${finalInfo.imdbId}")
+                _movieInfo.value = finalInfo
             }
         }
     }
@@ -495,17 +507,23 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     fun startWebQueuePolling() {
         webQueuePollingJob?.cancel()
         webQueuePollingJob = viewModelScope.launch {
+            Log.d(TAG, "Starting WebQueue polling loop...")
             while (isActive) {
                 val queueResult = webQueueClient.fetchQueueState()
                 if (queueResult.isSuccess) {
                     val items = queueResult.getOrDefault(emptyList())
                     if (items.isNotEmpty()) {
+                        Log.d(TAG, "WebQueue items updated: ${items.size} items in queue")
                         _webQueueScheduleItems.value = items
                     }
+                } else {
+                    Log.w(TAG, "WebQueue fetchQueueState failed: ${queueResult.exceptionOrNull()?.message}")
                 }
                 val nextScheduleResult = webQueueClient.fetchNextSchedule()
                 if (nextScheduleResult.isSuccess) {
-                    _webQueueNextSchedule.value = nextScheduleResult.getOrNull()
+                    val sched = nextScheduleResult.getOrNull()
+                    Log.d(TAG, "WebQueue next schedule updated: $sched")
+                    _webQueueNextSchedule.value = sched
                 }
                 delay(15000L)
             }
