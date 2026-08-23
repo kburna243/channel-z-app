@@ -92,8 +92,8 @@ Movies are best enjoyed on the big screen, but typing on a TV remote is tedious.
   CyTube chat messages glide in smoothly at the bottom of the screen. Font size, background opacity, and max lines are customizable on the fly.
 * **🎬 Smart Movie Info & Trivia (Zero API Keys):**  
   Strips scene tags (`1080p`, `BluRay`, `x264`) from the video title and loads posters, directors, release years, and trivia facts automatically.
-* **📅 Multi-Tier Schedule:**  
-  Reads the current playlist queue directly via WebSocket with automatic fallback parsers.
+* **📅 Multi-Tier Schedule & EPG:**  
+  Reads the current playlist queue directly via WebSocket with automatic fallback parsers. See [EPG & Scraper Architecture](docs/EPG_SCRAPER.md) for details.
 * **🎨 OLED-Tuned Themes:**  
   Four dark color profiles optimized for contrast and deep blacks on OLED displays.
 * **🔄 In-App Updater:**  
