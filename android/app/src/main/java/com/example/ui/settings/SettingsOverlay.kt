@@ -420,8 +420,7 @@ fun SettingsOverlay(
                                 }
                             }
 
-                            // Sammeleintrag: fuehrt in die Unterseite mit der Chat-Darstellung.
-                            // Der reine An/Aus-Schalter oben bleibt bewusst auf der ersten Ebene.
+                            // Sammeleintrag: fuehrt in die Unterseite mit der Chat-Darstellung (nur wenn Eingabe unterstuetzt wird).
                             if (BuildConfig.HAS_CHAT_INPUT) {
                                 item {
                                     FocusableSettingsItem(
@@ -436,30 +435,30 @@ fun SettingsOverlay(
                                         onClick = onCycleChatLayout
                                     ) {}
                                 }
+                            }
 
-                                // Konto und Anmeldung: gespeichertes Kennwort, Gastzugang,
-                                // Abmelden. Die Seite dahinter kennt nur die Full-Ausgabe.
-                                item {
-                                    FocusableSettingsItem(
-                                        title = stringResource(R.string.settings_chat_account),
-                                        subtitle = when {
-                                            loginState is LoginState.LoggedIn ->
-                                                stringResource(R.string.chat_account_status_in, loginState.username)
-                                            savedChatUsername.isNotEmpty() ->
-                                                stringResource(R.string.settings_chat_account_saved, savedChatUsername)
-                                            else -> stringResource(R.string.chat_account_status_out)
-                                        },
-                                        icon = Icons.Default.AccountCircle,
-                                        onClick = { onOpenPage(SettingsPage.CHAT_ACCOUNT) }
-                                    ) {
-                                        Text(
-                                            text = "›",
-                                            color = AccentIceBlue,
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 20.sp,
-                                            modifier = Modifier.padding(horizontal = 10.dp)
-                                        )
-                                    }
+                            // Konto und Anmeldung: gespeichertes Kennwort, Gastzugang, WebQueue OTP,
+                            // Abmelden. Sowohl fuer Fernseher als auch Mobilgeraete verfuegbar.
+                            item {
+                                FocusableSettingsItem(
+                                    title = stringResource(R.string.settings_chat_account),
+                                    subtitle = when {
+                                        loginState is LoginState.LoggedIn ->
+                                            stringResource(R.string.chat_account_status_in, loginState.username)
+                                        savedChatUsername.isNotEmpty() ->
+                                            stringResource(R.string.settings_chat_account_saved, savedChatUsername)
+                                        else -> stringResource(R.string.chat_account_status_out)
+                                    },
+                                    icon = Icons.Default.AccountCircle,
+                                    onClick = { onOpenPage(SettingsPage.CHAT_ACCOUNT) }
+                                ) {
+                                    Text(
+                                        text = "›",
+                                        color = AccentIceBlue,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 20.sp,
+                                        modifier = Modifier.padding(horizontal = 10.dp)
+                                    )
                                 }
                             }
 

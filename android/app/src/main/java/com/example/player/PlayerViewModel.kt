@@ -245,10 +245,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-        // Start WebQueue polling if already authenticated
-        if (webQueueClient.hasValidSession()) {
-            startWebQueuePolling()
-        }
+        // Start WebQueue polling loop
+        startWebQueuePolling()
 
         // Initial auto-hide timer for Remote Hints (6s on startup)
         scheduleRemoteHintsHide(6000L)
