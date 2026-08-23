@@ -1,6 +1,26 @@
 # 📜 Changelog
 
-All notable changes to the **Mikes 420 Grindhouse App** suite are documented in this file.
+All notable changes to the **Channel Z TV App** suite are documented in this file.
+
+---
+
+## [v1.7.0] - Build 36 (2026-08-23)
+### 🎬 Features & Integrations
+- **WebQueue Live EPG Schedule ([`kryten-webqueue`](https://github.com/grobertson/kryten-webqueue)):**
+  - Live playlist queue schedule integration directly from `queue.dropsugar.co/queue/state`.
+  - Sequential start time calculation (`HH:mm`), media duration formatting, upcoming item badges, and special marathon announcement banners.
+  - Replaced legacy text fallback with a fully scrollable, responsive EPG table.
+- **Magic OTP One-Time Login:**
+  - Automated authentication via CyTube private messages (`Kryten` bot): Enter your CyTube username once, and the app automatically captures and verifies the 6-digit OTP code to establish a persistent session.
+  - Added dedicated account management accessible on both Fire TV / Smart TVs and mobile devices (`Settings > Account & Login`).
+  - Added on-screen keyboard support with IME padding and fallback manual 6-digit code entry.
+- **Channel-Z Catalog & Movie Enrichment:**
+  - Integrated `/catalog/search` API to look up canonical IMDb identifiers (`imdb_tt`) and descriptions directly from the Channel-Z database.
+  - Automatically loads high-res movie posters, release years, directors, plot summaries, and IMDb trivia without guessing or manual configuration.
+- **User-Agent Standard:**
+  - Standardized all HTTP requests to `channelz-app`.
+### 🤝 Special Acknowledgements
+- **Special Thanks to Hollis ([@grobertson](https://github.com/grobertson)):** For authoring `kryten-webqueue`, maintaining the Channel-Z infrastructure, and providing awesome technical support and collaboration in integrating the backend APIs into the native app.
 
 ---
 

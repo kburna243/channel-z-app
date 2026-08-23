@@ -268,34 +268,44 @@ class WebQueueApiClient(
 
             var accumulatedSeconds = root.optDouble("remaining_seconds", 0.0)
             if (accumulatedSeconds <= 0.0) {
-                accumulatedSeconds = root.optDouble("remainingSeconds", 0.0)
+                accumulatedSeconds = root.optDouble("remainingSeconds", root.optDouble("time_remaining", 0.0))
             }
             val nowMs = System.currentTimeMillis()
-            val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
 
             for (i in 0 until itemsArray.length()) {
                 val itemObj = itemsArray.optJSONObject(i) ?: continue
                 val mediaObj = itemObj.optJSONObject("media") ?: itemObj
 
                 val title = mediaObj.optString("title", itemObj.optString("title", "Upcoming Item"))
-                val duration = mediaObj.optInt("seconds", mediaObj.optInt("duration", itemObj.optInt("seconds", 0)))
+                val durationSec = when {
+                    mediaObj.has("duration_sec") -> mediaObj.optInt("duration_sec")
+                    mediaObj.has("duration_seconds") -> mediaObj.optInt("duration_seconds")
+                    mediaObj.has("duration") -> mediaObj.optInt("duration")
+                    mediaObj.has("seconds") -> mediaObj.optInt("seconds")
+                    itemObj.has("duration_sec") -> itemObj.optInt("duration_sec")
+                    itemObj.has("duration_seconds") -> itemObj.optInt("duration_seconds")
+                    itemObj.has("duration") -> itemObj.optInt("duration")
+                    itemObj.has("seconds") -> itemObj.optInt("seconds")
+                    else -> 0
+                }
                 val mediaId = mediaObj.optString("id", itemObj.optString("uid", itemObj.optString("id", "")))
 
                 val estStartTimeMs = nowMs + (accumulatedSeconds * 1000).toLong()
                 val startTimeStr = timeFormat.format(Date(estStartTimeMs))
-                val durationStr = formatDuration(duration)
+                val durationStr = formatDuration(durationSec)
 
                 result.add(
                     QueueScheduleItem(
                         title = title,
-                        durationSeconds = duration,
+                        durationSeconds = durationSec,
                         startTimeFormatted = startTimeStr,
                         durationFormatted = durationStr,
                         mediaId = mediaId
                     )
                 )
 
-                accumulatedSeconds += duration
+                accumulatedSeconds += if (durationSec > 0) durationSec else 300
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing queue state JSON", e)

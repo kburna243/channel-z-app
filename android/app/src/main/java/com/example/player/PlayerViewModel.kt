@@ -123,12 +123,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         }
         val finalQueueItems = if (webQueueItems.isNotEmpty()) webQueueItems else socketQueue
 
-        val scheduleTitle = when {
-            !webNextSched.isNullOrBlank() -> "Upcoming Schedule"
-            !motdText.isNullOrBlank() -> "Channel-Z Room MOTD"
-            else -> null
-        }
-        val scheduleText = webNextSched ?: motdText
+        val scheduleTitle = if (!webNextSched.isNullOrBlank()) "Upcoming Marathon / Event" else null
+        val scheduleText = webNextSched
         val isFallback = finalQueueItems.isEmpty() && !scheduleText.isNullOrBlank()
 
         MetadataOverlayState(

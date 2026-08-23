@@ -76,9 +76,13 @@ Movies are best enjoyed on the big screen, but typing on a TV remote is tedious.
 | :---: | :---: |
 | <img src="docs/screenshots/01-player-fullscreen.png" width="400" /> | <img src="docs/screenshots/03-chat-as-subtitles.png" width="400" /> |
 
-| Movie Details & Trivia | Schedule & Queue |
+| Movie Details & Trivia | WebQueue Live EPG & Schedule |
 | :---: | :---: |
 | <img src="docs/screenshots/04-movie-details-trivia.png" width="400" /> | <img src="docs/screenshots/07-schedule-queue.png" width="400" /> |
+
+| Magic OTP & Account Setup |
+| :---: |
+| <img src="docs/screenshots/08-login-onboarding.png" width="500" /> |
 
 ---
 
@@ -88,12 +92,14 @@ Movies are best enjoyed on the big screen, but typing on a TV remote is tedious.
   Native sync handling with lead-time buffering and adaptive tempo correction (1.04x / 0.96x via the Sonic audio processor). Minor network drift is smoothed out imperceptibly without triggering buffering pauses.
 * **🎥 Hybrid Video Engine:**  
   Direct streams (HLS `.m3u8`, MP4, Google Drive, etc.) run through **AndroidX Media3 ExoPlayer** with full hardware decoding. External feeds (YouTube, Vimeo) run through a hardware-accelerated WebView bridge with an automated player watchdog.
+* **📅 WebQueue Live EPG & Schedule:**  
+  Direct live schedule integration with **[kryten-webqueue](https://github.com/grobertson/kryten-webqueue)** (`queue.dropsugar.co`). Formatted table view displaying calculated sequential start times (`HH:mm`), media durations, upcoming items, and special marathon announcements.
+* **✨ Magic OTP Login Flow:**  
+  Zero-friction authentication: Enter your CyTube username once, and the app automatically intercepts the one-time verification code sent via CyTube private message (`Kryten` bot), registers the session cookie, and keeps your schedule up to date.
+* **🎬 Smart Movie Info & Trivia (Zero API Keys):**  
+  Directly checks the Channel-Z catalog database for canonical IMDb identifiers (`imdb_tt`) and descriptions, loading official posters, directors, release years, plot summaries, and IMDb trivia.
 * **💬 Chat as TV Subtitles:**  
   CyTube chat messages glide in smoothly at the bottom of the screen. Font size, background opacity, and max lines are customizable on the fly.
-* **🎬 Smart Movie Info & Trivia (Zero API Keys):**  
-  Strips scene tags (`1080p`, `BluRay`, `x264`) from the video title and loads posters, directors, release years, and trivia facts automatically.
-* **📅 Multi-Tier Schedule & EPG:**  
-  Reads the current playlist queue directly via WebSocket with automatic fallback parsers. See [EPG & Scraper Architecture](docs/EPG_SCRAPER.md) for details.
 * **🎨 OLED-Tuned Themes:**  
   Four dark color profiles optimized for contrast and deep blacks on OLED displays.
 * **🔄 In-App Updater:**  
@@ -108,7 +114,7 @@ Movies are best enjoyed on the big screen, but typing on a TV remote is tedious.
 | **D-Pad UP** | Toggle Now-Playing HUD (Title, Poster, Runtime, Progress) |
 | **D-Pad DOWN** | Toggle Chat Subtitles on / off |
 | **D-Pad LEFT** | Open Movie Details & Trivia facts |
-| **D-Pad RIGHT** | Open Playlist & Queue schedule |
+| **D-Pad RIGHT** | Open WebQueue Live EPG & Sendeplan |
 | **D-Pad CENTER (OK)** | Play / Pause |
 | **MENU / OPTIONS** | Open Settings menu |
 | **BACK** | Close active overlay / Exit app |
@@ -145,6 +151,7 @@ Pre-built binaries are available directly under [Releases](https://github.com/kb
 
 ## 🤝 Credits & Acknowledgements
 
+* **[Hollis / grobertson](https://github.com/grobertson):** Massive thank you to Hollis, the architect of the Channel-Z infrastructure and creator of **[kryten-webqueue](https://github.com/grobertson/kryten-webqueue)** (`queue.dropsugar.co`). Thank you for your direct support, technical guidance, and for building the incredible backend and APIs that power the live queue and catalog!
 * **[calzoneman/sync](https://github.com/calzoneman/sync):** Thank you for the CyTube foundation and WebSocket protocol.
 * **[SPUDZARENEAT](https://github.com/spudzareneat):** For the lead-time sync inspiration from grindhouse-tv.
 * Thank you to the **Channel Z Community** on Reddit for the continuous feedback and ideas!
