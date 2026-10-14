@@ -63,7 +63,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.data.model.WebQueueOtpState
+import com.example.data.model.WebQueueLinkState
 import com.example.ui.theme.AccentIceBlue
 import com.example.ui.theme.AccentLavender
 import com.example.ui.theme.AccentPurple
@@ -79,31 +79,24 @@ import kotlinx.coroutines.delay
 @Composable
 fun FirstRunLoginDialog(
     isOpen: Boolean,
-    otpState: WebQueueOtpState,
-    initialUsername: String = "",
-    onStartMagicLogin: (username: String, password: String) -> Unit,
-    onVerifyManualOtp: (username: String, code: String) -> Unit,
+    linkState: WebQueueLinkState,
+    onVerifyDeviceCode: (code: String) -> Unit,
     onSkip: () -> Unit,
     onDismiss: () -> Unit
 ) {
     if (!isOpen) return
 
-    var username by remember { mutableStateOf(initialUsername) }
-    var password by remember { mutableStateOf("") }
+
+
     var manualCode by remember { mutableStateOf("") }
-    var showManualCodeInput by remember { mutableStateOf(false) }
 
-    val usernameFocusRequester = remember { FocusRequester() }
 
-    LaunchedEffect(isOpen) {
-        if (isOpen && initialUsername.isBlank()) {
-            delay(200)
-            try { usernameFocusRequester.requestFocus() } catch (_: Exception) {}
-        }
-    }
 
-    LaunchedEffect(otpState) {
-        if (otpState is WebQueueOtpState.Success) {
+
+
+
+    LaunchedEffect(linkState) {
+        if (linkState is WebQueueLinkState.Success) {
             delay(1500)
             onDismiss()
         }
@@ -113,7 +106,7 @@ fun FirstRunLoginDialog(
 
     Dialog(
         onDismissRequest = {
-            if (otpState !is WebQueueOtpState.RequestingOtp && otpState !is WebQueueOtpState.Verifying) {
+            if (linkState !is WebQueueLinkState.RequestingLink && linkState !is WebQueueLinkState.Verifying) {
                 onDismiss()
             }
         },
@@ -191,88 +184,64 @@ fun FirstRunLoginDialog(
 
                     Spacer(modifier = Modifier.height(10.dp))
 
-                    when (val state = otpState) {
-                        is WebQueueOtpState.Idle, is WebQueueOtpState.Failed -> {
-                            if (state is WebQueueOtpState.Failed) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(AccentVibrantOrange.copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                                        .border(1.dp, AccentVibrantOrange.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                                        .padding(10.dp)
-                                ) {
-                                    Text(
-                                        text = state.error,
-                                        style = TextStyle(color = AccentVibrantOrange, fontSize = 12.sp, fontWeight = FontWeight.Medium),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(14.dp))
+                    when (val state = linkState) {
+                        is WebQueueLinkState.Idle, is WebQueueLinkState.Failed -> {
+                            if (state is WebQueueLinkState.Failed) {
+                                Text(
+                                    text = state.error,
+                                    color = Color(0xFFFF5252),
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(bottom = 8.dp)
+                                )
                             }
 
-                            // Username input
-                            OutlinedTextField(
-                                value = username,
-                                onValueChange = { username = it },
-                                label = { Text("CyTube Username (Case-Sensitive)") },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Person, contentDescription = null, tint = AccentLavender)
-                                },
-                                singleLine = true,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .focusRequester(usernameFocusRequester),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = AccentPurple,
-                                    unfocusedBorderColor = SubtleBorder,
-                                    focusedTextColor = PureWhite,
-                                    unfocusedTextColor = PureWhite,
-                                    focusedLabelColor = AccentLavender,
-                                    unfocusedLabelColor = TextMuted,
-                                    cursorColor = AccentIceBlue
-                                ),
-                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                            Text(
+                                text = "1. Go to https://queue.dropsugar.co/link in your browser.",
+                                style = TextStyle(color = PureWhite, fontSize = 14.sp)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "2. Fill in a device name to identify your device.",
+                                style = TextStyle(color = PureWhite, fontSize = 14.sp)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "3. Enter the 5-character code below to connect your device.",
+                                style = TextStyle(color = PureWhite, fontSize = 14.sp)
                             )
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                            // Optional Password input
                             OutlinedTextField(
-                                value = password,
-                                onValueChange = { password = it },
-                                label = { Text("Password (Optional - leave empty for Guest)") },
-                                leadingIcon = {
-                                    Icon(Icons.Default.Lock, contentDescription = null, tint = AccentLavender)
+                                value = manualCode,
+                                onValueChange = { input ->
+                                    val formatted = input.take(5).uppercase()
+                                    manualCode = formatted
+                                    if (formatted.length == 5) {
+                                        onVerifyDeviceCode(formatted)
+                                    }
                                 },
-                                visualTransformation = PasswordVisualTransformation(),
+                                label = { Text("5-Character Code") },
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth(),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = AccentPurple,
-                                    unfocusedBorderColor = SubtleBorder,
-                                    focusedTextColor = PureWhite,
-                                    unfocusedTextColor = PureWhite,
-                                    focusedLabelColor = AccentLavender,
-                                    unfocusedLabelColor = TextMuted,
-                                    cursorColor = AccentIceBlue
-                                ),
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Password,
-                                    imeAction = ImeAction.Done
-                                ),
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
-                                        if (username.isNotBlank()) {
-                                            onStartMagicLogin(username, password)
+                                        if (manualCode.length == 5) {
+                                            onVerifyDeviceCode(manualCode)
                                         }
                                     }
+                                ),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = AccentIceBlue,
+                                    unfocusedBorderColor = SubtleBorder,
+                                    focusedTextColor = PureWhite,
+                                    unfocusedTextColor = PureWhite
                                 )
                             )
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            // Action Buttons
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -281,15 +250,14 @@ fun FirstRunLoginDialog(
                                     onClick = onSkip,
                                     modifier = Modifier.weight(1f),
                                     shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, SubtleBorder),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = TextSubtitleWhite)
+                                    border = BorderStroke(1.dp, SubtleBorder)
                                 ) {
-                                    Text("Skip / Guest", fontSize = 14.sp)
+                                    Text("Später", color = TextSubtitleWhite)
                                 }
 
                                 Button(
-                                    onClick = { onStartMagicLogin(username, password) },
-                                    enabled = username.isNotBlank(),
+                                    onClick = { onVerifyDeviceCode(manualCode) },
+                                    enabled = manualCode.length == 5,
                                     modifier = Modifier.weight(1.5f),
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
@@ -305,15 +273,9 @@ fun FirstRunLoginDialog(
                             }
                         }
 
-                        is WebQueueOtpState.RequestingOtp,
-                        is WebQueueOtpState.WaitingForCode,
-                        is WebQueueOtpState.Verifying -> {
-                            val stepText = when (state) {
-                                is WebQueueOtpState.RequestingOtp -> "1/3: Requesting authorization code from Kryten…"
-                                is WebQueueOtpState.WaitingForCode -> "2/3: Waiting for PM code… (Magic auto-handshake active)"
-                                is WebQueueOtpState.Verifying -> "3/3: Code received! Verifying WebQueue session…"
-                                else -> "Connecting…"
-                            }
+                        is WebQueueLinkState.RequestingLink,
+                        is WebQueueLinkState.Verifying -> {
+                            val stepText = "Connecting..."
 
                             Column(
                                 modifier = Modifier
@@ -338,72 +300,6 @@ fun FirstRunLoginDialog(
                                         textAlign = TextAlign.Center
                                     )
                                 )
-
-                                Spacer(modifier = Modifier.height(6.dp))
-
-                                Text(
-                                    text = "Kryten hat dir einen 6-stelligen Code per PM im CyTube-Chat geschickt. Der Code wird automatisch erkannt – oder du kannst ihn hier direkt eingeben:",
-                                    style = TextStyle(
-                                        color = TextMuted,
-                                        fontSize = 12.sp,
-                                        textAlign = TextAlign.Center,
-                                        lineHeight = 16.sp
-                                    )
-                                )
-
-                                Spacer(modifier = Modifier.height(14.dp))
-
-                                // Always-visible 6-digit code entry with auto-submit
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    OutlinedTextField(
-                                        value = manualCode,
-                                        onValueChange = { input ->
-                                            val digitsOnly = input.filter { it.isDigit() }.take(6)
-                                            manualCode = digitsOnly
-                                            if (digitsOnly.length == 6) {
-                                                onVerifyManualOtp(username, digitsOnly)
-                                            }
-                                        },
-                                        placeholder = { Text("6-stelliger Code (z.B. 123456)") },
-                                        singleLine = true,
-                                        modifier = Modifier.weight(1f),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Number,
-                                            imeAction = ImeAction.Done
-                                        ),
-                                        keyboardActions = KeyboardActions(
-                                            onDone = {
-                                                if (manualCode.length == 6) {
-                                                    onVerifyManualOtp(username, manualCode)
-                                                }
-                                            }
-                                        ),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            focusedBorderColor = AccentPurple,
-                                            unfocusedBorderColor = SubtleBorder,
-                                            focusedTextColor = PureWhite,
-                                            unfocusedTextColor = PureWhite,
-                                            cursorColor = AccentIceBlue
-                                        )
-                                    )
-
-                                    Button(
-                                        onClick = { onVerifyManualOtp(username, manualCode) },
-                                        enabled = manualCode.length == 6,
-                                        shape = RoundedCornerShape(10.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = AccentPurple,
-                                            disabledContainerColor = AccentPurple.copy(alpha = 0.3f)
-                                        )
-                                    ) {
-                                        Text("Verify", fontWeight = FontWeight.Bold)
-                                    }
-                                }
-
                                 Spacer(modifier = Modifier.height(10.dp))
 
                                 OutlinedButton(
@@ -416,7 +312,7 @@ fun FirstRunLoginDialog(
                             }
                         }
 
-                        is WebQueueOtpState.Success -> {
+                        is WebQueueLinkState.Success -> {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()

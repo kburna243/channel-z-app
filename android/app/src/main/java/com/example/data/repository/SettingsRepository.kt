@@ -125,4 +125,16 @@ class SettingsRepository(context: Context) {
     fun clearWebQueueCookies() {
         prefs.edit().remove("webqueue_cookies").apply()
     }
+
+    fun webQueueApiKey(): String? {
+        return prefs.getString("webqueue_api_key", null)
+    }
+
+    fun saveWebQueueApiKey(apiKey: String) {
+        prefs.edit().putString("webqueue_api_key", apiKey).apply()
+    }
+
+    fun clearWebQueueApiKey() {
+        prefs.edit().remove("webqueue_api_key").apply()
+    }
 }

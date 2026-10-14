@@ -24,7 +24,7 @@ import com.example.data.scraper.DataScraper
 import com.example.data.scraper.MetadataOverlayState
 import com.example.data.socket.CyTubeSocketClient
 import com.example.ui.player.extractYouTubeId
-import com.example.data.model.WebQueueOtpState
+import com.example.data.model.WebQueueLinkState
 import com.example.data.webqueue.WebQueueApiClient
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -81,8 +81,8 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     val queueScheduleItems: StateFlow<List<QueueScheduleItem>> = dataScraper.queueScheduleItems
     val mediaSyncEvent: SharedFlow<MediaSyncUpdate> = socketClient.mediaSyncEvent
 
-    private val _otpState = MutableStateFlow<WebQueueOtpState>(WebQueueOtpState.Idle)
-    val otpState: StateFlow<WebQueueOtpState> = _otpState.asStateFlow()
+    private val _linkState = MutableStateFlow<WebQueueLinkState>(WebQueueLinkState.Idle)
+    val linkState: StateFlow<WebQueueLinkState> = _linkState.asStateFlow()
 
     private val _isFirstRunDialogOpen = MutableStateFlow(!settingsRepo.isFirstRunCompleted() && settingsRepo.chatCredentials() == null)
     val isFirstRunDialogOpen: StateFlow<Boolean> = _isFirstRunDialogOpen.asStateFlow()
@@ -214,32 +214,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
 
-        // Magic WebQueue OTP Listener: Automatisches Abfangen des Kryten-Bestätigungscodes
-        viewModelScope.launch {
-            socketClient.magicOtpCodeEvent.collect { code ->
-                val currentOtpState = _otpState.value
-                val username = when (currentOtpState) {
-                    is WebQueueOtpState.WaitingForCode -> currentOtpState.username
-                    is WebQueueOtpState.RequestingOtp -> pendingCredentials?.first ?: _savedChatUsername.value
-                    else -> pendingCredentials?.first ?: _savedChatUsername.value
-                }.ifBlank { _savedChatUsername.value }
 
-                if (username.isNotBlank() && code.isNotBlank()) {
-                    Log.i(TAG, "✨ Magic OTP triggered for '$username' with code '$code'")
-                    _otpState.value = WebQueueOtpState.Verifying(username, code)
-                    val verifyResult = webQueueClient.verifyOtp(username, code)
-                    if (verifyResult.isSuccess) {
-                        Log.i(TAG, "🎉 WebQueue Magic Login successful!")
-                        _otpState.value = WebQueueOtpState.Success(username)
-                        settingsRepo.setFirstRunCompleted(true)
-                        startWebQueuePolling()
-                    } else {
-                        val err = verifyResult.exceptionOrNull()?.message ?: "OTP verification failed"
-                        _otpState.value = WebQueueOtpState.Failed(err)
-                    }
-                }
-            }
-        }
 
         // Start WebQueue polling loop
         startWebQueuePolling()
@@ -425,61 +400,25 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
         _webQueueScheduleItems.value = emptyList()
         _webQueueNextSchedule.value = null
         webQueuePollingJob?.cancel()
-        _otpState.value = WebQueueOtpState.Idle
+        _linkState.value = WebQueueLinkState.Idle
     }
 
-    /**
-     * Startet den Magic Login:
-     * 1. Verbindet / meldet den CyTube-Chat an.
-     * 2. Fordert den OTP-Code bei WebQueue (queue.dropsugar.co) an.
-     * 3. Kryten schickt den Code per PM -> Socket extrahiert den Code automatisch -> Verify!
-     */
-    fun startMagicLogin(username: String, password: String = "") {
-        val cleanName = username.trim()
-        if (cleanName.isBlank()) {
-            _otpState.value = WebQueueOtpState.Failed("Please enter your CyTube username")
-            return
-        }
-        _otpState.value = WebQueueOtpState.RequestingOtp
-        pendingCredentials = cleanName to password
-
-        viewModelScope.launch {
-            // 1. CyTube Socket verbinden / anmelden
-            socketClient.connect(settings.value.roomName, cleanName to password)
-            if (password.isNotBlank()) {
-                socketClient.login(cleanName, password)
-            }
-
-            // 2. OTP bei WebQueue anfordern (Kryten schickt PM)
-            val requestResult = webQueueClient.requestOtp(cleanName)
-            if (requestResult.isFailure) {
-                val err = requestResult.exceptionOrNull()?.message ?: "Failed to request code from WebQueue"
-                _otpState.value = WebQueueOtpState.Failed(err)
-                return@launch
-            }
-
-            _otpState.value = WebQueueOtpState.WaitingForCode(cleanName)
-        }
-    }
-
-    /** Manuelle Eingabe des 6-stelligen Codes, falls gewünscht. */
-    fun verifyManualOtp(username: String, code: String) {
-        val cleanName = username.trim().ifBlank { _savedChatUsername.value }
+    fun linkWebQueueDevice(code: String) {
         val cleanCode = code.trim()
-        if (cleanName.isBlank() || cleanCode.isBlank()) {
-            _otpState.value = WebQueueOtpState.Failed("Username and 6-digit code are required")
+        if (cleanCode.isBlank()) {
+            _linkState.value = WebQueueLinkState.Failed("Code is required")
             return
         }
-        _otpState.value = WebQueueOtpState.Verifying(cleanName, cleanCode)
+        _linkState.value = WebQueueLinkState.Verifying(cleanCode)
         viewModelScope.launch {
-            val result = webQueueClient.verifyOtp(cleanName, cleanCode)
+            val result = webQueueClient.linkDevice(cleanCode)
             if (result.isSuccess) {
-                _otpState.value = WebQueueOtpState.Success(cleanName)
+                _linkState.value = WebQueueLinkState.Success(result.getOrDefault(""))
                 settingsRepo.setFirstRunCompleted(true)
                 startWebQueuePolling()
             } else {
                 val err = result.exceptionOrNull()?.message ?: "Invalid or expired code"
-                _otpState.value = WebQueueOtpState.Failed(err)
+                _linkState.value = WebQueueLinkState.Failed(err)
             }
         }
     }
@@ -494,7 +433,7 @@ class PlayerViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun openAccountLoginDialog() {
-        _otpState.value = WebQueueOtpState.Idle
+        _linkState.value = WebQueueLinkState.Idle
         _isFirstRunDialogOpen.value = true
     }
 

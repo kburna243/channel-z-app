@@ -1,7 +1,7 @@
 package com.example
 
 import com.example.data.model.PrivateMessage
-import com.example.data.model.WebQueueOtpState
+import com.example.data.model.WebQueueLinkState
 import com.example.data.repository.SettingsRepository
 import com.example.data.webqueue.WebQueueApiClient
 import org.junit.Assert.assertEquals
