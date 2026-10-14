@@ -3,13 +3,12 @@ package com.example.data.model
 /**
  * State of the WebQueue Magic Login flow.
  */
-sealed interface WebQueueOtpState {
-    data object Idle : WebQueueOtpState
-    data object RequestingOtp : WebQueueOtpState
-    data class WaitingForCode(val username: String) : WebQueueOtpState
-    data class Verifying(val username: String, val code: String) : WebQueueOtpState
-    data class Success(val username: String) : WebQueueOtpState
-    data class Failed(val error: String) : WebQueueOtpState
+sealed interface WebQueueLinkState {
+    data object Idle : WebQueueLinkState
+    data object RequestingLink : WebQueueLinkState
+    data class Verifying(val code: String) : WebQueueLinkState
+    data class Success(val username: String) : WebQueueLinkState
+    data class Failed(val error: String) : WebQueueLinkState
 }
 
 /**

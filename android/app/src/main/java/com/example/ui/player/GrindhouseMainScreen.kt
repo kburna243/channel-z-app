@@ -121,7 +121,7 @@ fun GrindhouseMainScreen(
     val emotes by viewModel.emotes.collectAsStateWithLifecycle()
     val showExitDialog by viewModel.showExitDialog.collectAsStateWithLifecycle()
     val isFirstRunDialogOpen by viewModel.isFirstRunDialogOpen.collectAsStateWithLifecycle()
-    val otpState by viewModel.otpState.collectAsStateWithLifecycle()
+    val linkState by viewModel.linkState.collectAsStateWithLifecycle()
     val mediaSyncUpdate by viewModel.mediaSyncEvent.collectAsStateWithLifecycle(initialValue = null)
 
     // Handle system back gestures and back button on Android phones smoothly
@@ -626,7 +626,7 @@ fun GrindhouseMainScreen(
                     onCycleChatLayout = { viewModel.cycleChatLayout() },
                     loginState = loginState,
                     savedChatUsername = savedChatUsername,
-                    onLoginChat = { name, pw -> viewModel.startMagicLogin(name, pw) },
+                    onLoginChat = { name, pw -> viewModel.login(name, pw) },
                     onLogoutChat = { viewModel.logout() },
                     onToggleImdb = { viewModel.toggleImdb() },
                     onUpdateOpacity = { viewModel.updateChatOpacity(it) },
@@ -647,10 +647,10 @@ fun GrindhouseMainScreen(
                 // 10. WebQueue & CyTube First-Run Onboarding Dialog
                 com.example.ui.components.FirstRunLoginDialog(
                     isOpen = isFirstRunDialogOpen,
-                    otpState = otpState,
-                    initialUsername = savedChatUsername,
-                    onStartMagicLogin = { u, p -> viewModel.startMagicLogin(u, p) },
-                    onVerifyManualOtp = { u, c -> viewModel.verifyManualOtp(u, c) },
+                    linkState = linkState,
+
+                    onVerifyDeviceCode = { c -> viewModel.linkWebQueueDevice(c) },
+
                     onSkip = { viewModel.skipFirstRun() },
                     onDismiss = { viewModel.dismissFirstRunDialog() }
                 )
