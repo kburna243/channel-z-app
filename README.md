@@ -140,6 +140,11 @@ Pre-built binaries are available directly under [Releases](https://github.com/kb
 1. Download **[channel-z.ipa](https://github.com/kburna243/channel-z-app/releases/latest/download/channel-z.ipa)**.
 2. Install via **AltStore**, **Sideloadly**, or **TrollStore**.
 
+### 🧪 Beta Version
+A beta version with the latest features is also available for testing:
+* **[channel-z-light-beta.apk](channel-z-light-beta.apk)** (Fire TV, Android TV, Smart TVs)
+* **[channel-z-full-beta.apk](channel-z-full-beta.apk)** (Smartphones, Tablets)
+
 ---
 
 ## 👥 Authors & Co-Creators
